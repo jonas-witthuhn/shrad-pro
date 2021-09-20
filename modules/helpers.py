@@ -38,8 +38,7 @@ if sys.version_info[0]==3:
         """Replace the default warnings.showwarning function to include in print_status
         """
         msg = warnings.WarningMessage(message, category, filename, lineno, file, line)
-        print_status('There is a warning!:',glvl,gtab,'>>','warning')
-        print_status(str(msg.message),glvl,gtab,'>>','warning')
+        print_status(str(msg.message),glvl,gtab,'WARNING: ','warning')
     warnings.showwarning = _warning
 else:
     def _warning(
@@ -49,13 +48,16 @@ else:
         lineno = -1):
         """Replace the default warnings.showwarning function to include in print_status
         """
-        print_status('There is a warning!:',glvl,gtab,'>>','warning')
-        print_status(message[0],glvl,gtab,'>>','warning')
+        print_status(message[0],glvl,gtab,'WARNING: ','warning')
     warnings.showwarning = _warning
 
     
 def print_debug(txt):
     print_status(txt,lvl=0,pfx='DEBUG: ',style='b')
+
+def print_warning(txt):
+#     print_status(txt,lvl=0,pfx='WARNING: ')
+    warnings.warn(txt)
 
 def print_status(txt,lvl=0,tab='  |',pfx='',style='',end='',flush=False):
     r"""
@@ -127,6 +129,7 @@ def define_commandline_parser():
                                                  - Use unix wildcards to specify multiple files
                                                  - Path can be relative or absolute
                                                """))
+                          
         pars.add_argument('-v','--verbose',action='store_true',
                           help="enable processing status messages")
         pars.add_argument('-d','--debug',action='store_true',
@@ -174,11 +177,56 @@ def define_commandline_parser():
                     hour, minute, second, microsecond
                 A Year of two digits will be interpreted as 2000 + year.
                 However, the retrieved dates of all input files have to be unique.
-                The default is '%(default)s'
+                The default is:
+                %(default)s
                 """)) 
-    l1a_parser.add_argument('-c','--calibration',type=str,
+    l1a_parser.add_argument('--calibration-file',type=str,
                             default="data/GUVis_calibrations.json",
-                            help="Path to calibration file (.json), the default is %(default)s")
+                            help=textwrap.dedent("""\
+                            Path to absolute spectral calibration file (.json),
+                            for all channels of the GUVis.
+                            The default is:
+                            %(default)s
+                            """))
+
+    l1a_parser.add_argument('--uvcosine-correction-channel', action='append',type=int,
+                            default=[305,313],
+                            help=textwrap.dedent("""\
+                            Add to the list of channels to apply cosine response correction
+                            (for UV channels (e.g., 305,313))
+                            based on Biospherical correction file.
+                            Requires the file specified by --uvchannel-correction-file.
+                            The default channels are %(default)s if available.
+                            """))
+    l1a_parser.add_argument('--uvcosine-correction-file',type=str,
+                            default="data/Correction_function_GUVis3511_SN351.csv",
+                            help=textwrap.dedent("""\
+                            File of correction factors for UV-channel cosine response correction.
+                            File requires comma separated columns and a header line
+                            (solar zenith angle, channel names ...), e.g.:
+                                SZA,Es305,Es313
+                            Provided by Biospherical Inc. (Instrument specific).
+                            The default is %(default)s.
+                            """))
+    
+    l1a_parser.add_argument("--disable-ancillary-ins",
+                            action="store_true",
+                            help=textwrap.dedent("""\
+                            Disables the use of ancillary 
+                            inertal navigation system (INS) data.
+                            If not set, the use is enabled and the 
+                            following parameters are aquired from the
+                            ancillary database (see ConfigFile.ini):
+                                * Position of the GUVis: latitude, longitude
+                                * Alignment of the GUVis: pitch, roll, yaw
+                            Subsequently, the solar zenith and azimuth angle
+                            will be calculated based on this information.
+                            """))
+    l1a_parser.add_argument('--disable-uvcosine-correction',
+                            action='store_true',
+                            help=textwrap.dedent("""\
+                            Optionally switch off UV channel cosine correction.
+                            """))
     
     # process l1b
     l1b_parser = process_subparser.add_parser("l1b",

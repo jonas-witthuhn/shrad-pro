@@ -322,7 +322,7 @@ def load_raw(date,
                         lon=np.ones(len(datdt))*position['longitude']
                     except:
                         pos=False
-                        warnings.warn("There is no Position information"
+                        "There is no Position information"
                                       +"available! Further calculations"
                                       +"involving sun/radiometer positon"
                                       +"are incorrect!")
