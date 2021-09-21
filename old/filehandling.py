@@ -324,7 +324,7 @@ def load_raw(date,
                         pos=False
                         "There is no Position information"
                                       +"available! Further calculations"
-                                      +"involving sun/radiometer positon"
+                                      +"involving sun/radiometer position"
                                       +"are incorrect!")
             if pos:
                 jday=sp.datetime2julday(datet)

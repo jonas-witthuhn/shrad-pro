@@ -184,7 +184,13 @@ def define_commandline_parser():
                             default="data/GUVis_calibrations.json",
                             help=textwrap.dedent("""\
                             Path to absolute spectral calibration file (.json),
-                            for all channels of the GUVis.
+                            for all channels of the GUVis. Using this file,
+                            the radiation channels are calibrated with drift
+                            corrected calibration factors, by linear interpolation
+                            of specified calibration factors and dates in the file.
+                            If this is not wanted and the files are precalibrated
+                            form the GUVis internal storage, than this can be
+                            switched of by specifying '--calbration-file ""'.
                             The default is:
                             %(default)s
                             """))
@@ -222,11 +228,36 @@ def define_commandline_parser():
                             Subsequently, the solar zenith and azimuth angle
                             will be calculated based on this information.
                             """))
+    l1a_parser.add_argument("--disable-ancillary-met",
+                            action="store_true",
+                            help=textwrap.dedent("""\
+                            Disables the use of ancillary 
+                            meteorological (INS) data.
+                            If not set, the use is enabled and the 
+                            following parameters are aquired from the
+                            ancillary database (see ConfigFile.ini):
+                                * Basic meteorological parameters: 
+                                    * air temperature
+                                    * air pressure
+                                    * relative humidity
+                            This data is required for estimation
+                            of Rayleigh-scattering OD and WV-OD
+                            for the AOD calculation.
+                            """))
     l1a_parser.add_argument('--disable-uvcosine-correction',
                             action='store_true',
                             help=textwrap.dedent("""\
                             Optionally switch off UV channel cosine correction.
                             """))
+    l1a_parser.add_argument('--coordinates',nargs=2,
+                            default=[False,False],
+                            help=textwrap.dedent("""\
+                            Latitude [degree East] and Longitude [degree North],
+                            required if the observation is stationary on land and
+                            no GPS information is available.
+                            The default is %(default)s.
+                            """))
+                            
     
     # process l1b
     l1b_parser = process_subparser.add_parser("l1b",

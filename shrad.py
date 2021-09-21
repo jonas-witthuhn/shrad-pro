@@ -62,6 +62,7 @@ if args.ShradJob == "process":
             # loading raw data to xarray Dataset
             ProcessFiles = np.array(args.input)[InputDays==day]
             DailyDS = utils.load_rawdata_and_combine(Files=ProcessFiles,
+                                                     CalibFile=args.calibration_file,
                                                      **MESSAGES)
             if type(DailyDS) == bool:
                 # no data? skip day!
@@ -95,31 +96,50 @@ if args.ShradJob == "process":
                 if type(DailyDS) == bool:
                     continue
 
+            # add meteorologicyl ancillary data
+            if not args.disable_ancillary_met:
+                # requires:
+                #  * the correct paths in ConfigFile.ini
+                #  * ancillary data in the correct netCDF format
+                #  * correct naming of variables in netCDF:
+                #     * time,T,P,RH
+                #  * correct definition of units:
+                #     * T - [K] - air_temperature
+                #     * P - [Pa] - air_pressure
+                #     * RH - [1] - relative_humidity
+
+                DailyDS = utils.add_met_data(DS=DailyDS,
+                                             **MESSAGES)
                 
-            
-            
-            if not args.disable_uvcosine_correction:
-                # do UV channel corrections
-                # for cosine response adjustment depending on
-                # diffuser (cosine collector) and inlet
-                # ! requires instrument specific calibration file
-                # ! -> provided by Biospherical Inc.
-                kwords = dict(DS=DailyDS,
-                              Channels=args.uvcosine_correction_channel,
-                              File=args.uvcosine_correction_file,
-                              **MESSAGES)
-                DailyDS = utils.correct_uv_cosine_response(**kwords)
-            
+                if type(DailyDS) == bool:
+                    continue
 
+            # add sun position
+            DailyDS = utils.add_sun_position(DS=DailyDS,
+                                             coords=args.coordinates,
+                                             **MESSAGES)
+            
+            
+            # add proper standard names, attributes, encoding
+            
+            
+            # store to file
+            
+            
+            
+## alignment correction
+
+
+#             if not args.disable_uvcosine_correction:
+#                 # do UV channel corrections
+#                 # for cosine response adjustment depending on
+#                 # diffuser (cosine collector) and inlet
+#                 # ! requires instrument specific calibration file
+#                 # ! -> provided by Biospherical Inc.
+#                 kwords = dict(DS=DailyDS,
+#                               Channels=args.uvcosine_correction_channel,
+#                               File=args.uvcosine_correction_file,
+#                               **MESSAGES)
+#                 DailyDS = utils.correct_uv_cosine_response(**kwords)
                         
-                        
             
-
-        #for date in np.unique(input_dates
-            # read and combine daily input files
-
-
-
-            # load calibration file and interpolate calibration factors
-#             with open(args.calibration,'r') as f:
-#                 calibrations=json.load(f)
