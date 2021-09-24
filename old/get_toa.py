@@ -69,7 +69,8 @@ References
 
 import sys
 import warnings
-if sys.version_info[0]==3:
+
+if sys.version_info[0] == 3:
     from urllib.request import urlopen
 else:
     from urllib import urlopen
@@ -81,6 +82,7 @@ from scipy.signal import general_gaussian
 
 import sunpos as sp
 from helpers import print_status
+
 
 def _assume_TSI(date,
                 basepf='/../lookuptables/',
@@ -110,30 +112,30 @@ def _assume_TSI(date,
     """
 
     ###Load previouse aquired data.
-    fname=basepf+'TSI.dat'
-    dat=np.loadtxt(fname)[:,[0,1,5]]
-    dat=dat[dat[:,0].argsort()]
-    print_status("Assuming TSI from interpolating dataset %s"%(fname),lvl)
-    
+    fname = basepf + 'TSI.dat'
+    dat = np.loadtxt(fname)[:, [0, 1, 5]]
+    dat = dat[dat[:, 0].argsort()]
+    print_status("Assuming TSI from interpolating dataset %s" % (fname), lvl)
+
     ###Interpolate or extrapolate TSI from the dataset.
     ###Julday is calculated for EPOCH_J2000_0 at 00:00AM.
-    date=date.astype("datetime64[s]")
-    jday=sp.datetime2julday(date.astype("datetime64[D]"))-0.5
+    date = date.astype("datetime64[s]")
+    jday = sp.datetime2julday(date.astype("datetime64[D]")) - 0.5
 
-    z=np.polyfit(dat[:,0],dat[:,1],3)
-    f=np.poly1d(z)
-    tsi=f(jday)
-    etsi=np.std(dat[:,1])+np.median(dat[:,2])
-    
+    z = np.polyfit(dat[:, 0], dat[:, 1], 3)
+    f = np.poly1d(z)
+    tsi = f(jday)
+    etsi = np.std(dat[:, 1]) + np.median(dat[:, 2])
+
     ### Warn if there is a large data gap (>150days) in the dataset to the
     ### given date.
-    if np.min(np.abs(dat[:,0]-jday))>150:
+    if np.min(np.abs(dat[:, 0] - jday)) > 150:
         warnings.warn("Assuming TSI may not be stable with "
-                      +"a datagap of %d days."%(np.min(np.abs(dat[:,0]-jday)))
-                      +"Dataset used for extrapolation: %s"%fname)
-    print_status("...done!",lvl,style='g')
-    print_status("",lvl-1)
-    return np.float(tsi),np.float(etsi)
+                      + "a datagap of %d days." % (np.min(np.abs(dat[:, 0] - jday)))
+                      + "Dataset used for extrapolation: %s" % fname)
+    print_status("...done!", lvl, style='g')
+    print_status("", lvl - 1)
+    return np.float(tsi), np.float(etsi)
 
 
 def _get_TSI(date,
@@ -162,106 +164,104 @@ def _get_TSI(date,
         The measurement uncertainty of the total solar irradiance at 1AU [Wm-2]
     """
     print_status(str("Get +-12h (24h) mean of total solar irradiance (TSI)"
-                     +"at 1AU for date: "
-                     +pd.to_datetime(date).strftime("%Y-%m-%d 12:00 UTC")),lvl)
-    
+                     + "at 1AU for date: "
+                     + pd.to_datetime(date).strftime("%Y-%m-%d 12:00 UTC")), lvl)
+
     ###Julday is calculated for EPOCH_J2000_0 at 00:00AM.
-    date=date.astype("datetime64[s]")
-    jday=sp.datetime2julday(date.astype("datetime64[D]"))-0.5    
-    
-    
-    if (np.datetime64('today')-date).astype('timedelta64[D]').astype(int)<=7:
-        print_status("No SORCE data for this day. Data is published with a 7 day delay.",lvl,style='fail')
-        tsi1au,etsi=_assume_TSI(date,basepf,lvl+1)
-        print_status("..done!",lvl,style='g')
-        print_status("",lvl-1)
-        return np.float(tsi1au),np.float(etsi)
+    date = date.astype("datetime64[s]")
+    jday = sp.datetime2julday(date.astype("datetime64[D]")) - 0.5
+
+    if (np.datetime64('today') - date).astype('timedelta64[D]').astype(int) <= 7:
+        print_status("No SORCE data for this day. Data is published with a 7 day delay.", lvl, style='fail')
+        tsi1au, etsi = _assume_TSI(date, basepf, lvl + 1)
+        print_status("..done!", lvl, style='g')
+        print_status("", lvl - 1)
+        return np.float(tsi1au), np.float(etsi)
 
     ### Check if data is already in database, if not download it from SORCEdata
     ### and save it to the database (dat).    
     ### From database (dat) aquiring jday,tsi_1au,etsi_1au - later to be scaled
     ### earth_sun_distance.
-    fname=basepf+'TSI.dat'
-    dat=np.loadtxt(fname)
-    if len(dat)==0: # file is empty
-        dat=np.zeros((1,13))
-    if np.int64(jday) not in np.array(dat[:,0],dtype=np.int64):
-        print_status("Download todays TSI data from lasp.colorado.edu",lvl)
-        url=str("http://lasp.colorado.edu/lisird/latis/dap/"
-                +"sorce_tsi_24hr_l3.tab?&time>="
-                +pd.to_datetime(date).strftime(str("%Y-%m-%dT00:00:00&time"
-                                                   +"<%Y-%m-%dT23:59:59")))
+    fname = basepf + 'TSI.dat'
+    dat = np.loadtxt(fname)
+    if len(dat) == 0:  # file is empty
+        dat = np.zeros((1, 13))
+    if np.int64(jday) not in np.array(dat[:, 0], dtype=np.int64):
+        print_status("Download todays TSI data from lasp.colorado.edu", lvl)
+        url = str("http://lasp.colorado.edu/lisird/latis/dap/"
+                  + "sorce_tsi_24hr_l3.tab?&time>="
+                  + pd.to_datetime(date).strftime(str("%Y-%m-%dT00:00:00&time"
+                                                      + "<%Y-%m-%dT23:59:59")))
         try:
-            u=urlopen(url)
+            u = urlopen(url)
         except:
             print_status("lasp.colorado.edu is not available. No Internet?",
                          lvl,
                          style='fail')
-            tsi1au,etsi=_assume_TSI(date,basepf,lvl+1)
-            print_status("..done!",lvl,style='g')
-            print_status("",lvl-1)
-            return np.float(tsi1au),np.float(etsi)
-        ulines=u.readlines()
-        
+            tsi1au, etsi = _assume_TSI(date, basepf, lvl + 1)
+            print_status("..done!", lvl, style='g')
+            print_status("", lvl - 1)
+            return np.float(tsi1au), np.float(etsi)
+        ulines = u.readlines()
+
         u.close()
-        if len(ulines)!=0:
-            l=ulines[-1].decode()
-            l=l.replace('\t' ,' ')
+        if len(ulines) != 0:
+            l = ulines[-1].decode()
+            l = l.replace('\t', ' ')
             try:
-                l.split(' ') #check if the data is in proper shape to continue
+                l.split(' ')  # check if the data is in proper shape to continue
             except:
-                print_status("No SORCE data for this day.",lvl,style='fail')
-                tsi1au,etsi=_assume_TSI(date,basepf,lvl+1)
-                print_status("..done!",lvl,style='g')
-                print_status("",lvl-1)
-                return np.float(tsi1au),np.float(etsi)
+                print_status("No SORCE data for this day.", lvl, style='fail')
+                tsi1au, etsi = _assume_TSI(date, basepf, lvl + 1)
+                print_status("..done!", lvl, style='g')
+                print_status("", lvl - 1)
+                return np.float(tsi1au), np.float(etsi)
         else:
-            print_status("No SORCE data for this day.",lvl,style='fail')
-            tsi1au,etsi=_assume_TSI(date,basepf,lvl+1)
-            print_status("..done!",lvl,style='g')
-            print_status("",lvl-1)
-            return np.float(tsi1au),np.float(etsi)
-        tsi_append=l.split(' ')
-        
-        tsi_append[0]=np.float(jday)
-        np.savetxt(fname,np.array(np.vstack((dat,tsi_append)),dtype=np.float),
+            print_status("No SORCE data for this day.", lvl, style='fail')
+            tsi1au, etsi = _assume_TSI(date, basepf, lvl + 1)
+            print_status("..done!", lvl, style='g')
+            print_status("", lvl - 1)
+            return np.float(tsi1au), np.float(etsi)
+        tsi_append = l.split(' ')
+
+        tsi_append[0] = np.float(jday)
+        np.savetxt(fname, np.array(np.vstack((dat, tsi_append)), dtype=np.float),
                    delimiter=' ',
                    header=str('jday '
-                              +'tsi_1au'
-                              +'instrument_accuracy_1au '
-                              +'instrument_precision_1au '
-                              +'solar_standard_deviation_1au '
-                              +'measurement_uncertainty_1au '
-                              +'tsi_true_earth '
-                              +'instrument_accuracy_true_earth '
-                              +'instrument_precision_true_earth '
-                              +'solar_standard_deviation_true_earth '
-                              +'measurement_uncertainty_true_earth '
-                              +'avg_measurement_date '
-                              +'std_dev_measurement_date\n'
-                              +'EPOCH_J2000_0+12h'
-                              +'Wm-2 '+'Wm-2 '+'Wm-2 '+'Wm-2 '+'Wm-2 '+'Wm-2 '
-                              +'Wm-2 '+'Wm-2 '+'Wm-2 '+'Wm-2 '
-                              +'sorce_julian_date '+'days'))
-        print_status("..done!",lvl,style='g')
-        print_status("",lvl-1)
-        tsi1au,etsi=tsi_append[1],tsi_append[5]
-        return np.float(tsi1au),np.float(etsi)
+                              + 'tsi_1au'
+                              + 'instrument_accuracy_1au '
+                              + 'instrument_precision_1au '
+                              + 'solar_standard_deviation_1au '
+                              + 'measurement_uncertainty_1au '
+                              + 'tsi_true_earth '
+                              + 'instrument_accuracy_true_earth '
+                              + 'instrument_precision_true_earth '
+                              + 'solar_standard_deviation_true_earth '
+                              + 'measurement_uncertainty_true_earth '
+                              + 'avg_measurement_date '
+                              + 'std_dev_measurement_date\n'
+                              + 'EPOCH_J2000_0+12h'
+                              + 'Wm-2 ' + 'Wm-2 ' + 'Wm-2 ' + 'Wm-2 ' + 'Wm-2 ' + 'Wm-2 '
+                              + 'Wm-2 ' + 'Wm-2 ' + 'Wm-2 ' + 'Wm-2 '
+                              + 'sorce_julian_date ' + 'days'))
+        print_status("..done!", lvl, style='g')
+        print_status("", lvl - 1)
+        tsi1au, etsi = tsi_append[1], tsi_append[5]
+        return np.float(tsi1au), np.float(etsi)
     else:
-        tsi1au,etsi=dat[np.array(dat[:,0],dtype=np.int64)==np.int64(jday),[1,5]]
-        print_status("..done!",lvl,style='g')
-        print_status("",lvl-1)
-        return np.float(tsi1au),np.float(etsi)
-
+        tsi1au, etsi = dat[np.array(dat[:, 0], dtype=np.int64) == np.int64(jday), [1, 5]]
+        print_status("..done!", lvl, style='g')
+        print_status("", lvl - 1)
+        return np.float(tsi1au), np.float(etsi)
 
 
 def get_I0(date,
-            wvls,
-            cwvls,
-            basepf='../lookuptables/',
-            dbresponse="calibration/spectralResponse.dat",
-            assume='close',
-            lvl=0):
+           wvls,
+           cwvls,
+           basepf='../lookuptables/',
+           dbresponse="calibration/spectralResponse.dat",
+           assume='close',
+           lvl=0):
     r"""
     Calculating the top of atmosphere (TOA) spectral irradiance for given
     wavelengths `wvls`. The irradiance is scaled to actual sun activity and
@@ -307,79 +307,79 @@ def get_I0(date,
         `eI0` is the assumed error of `I0` calculated from spectrum variations
         and total solar irradiance measurement uncertainty.
     """
-    wvls=np.array(wvls,dtype=np.float)
-    print_status("Calculate spectral Irradiance at TOA (I0)",lvl)
+    wvls = np.array(wvls, dtype=np.float)
+    print_status("Calculate spectral Irradiance at TOA (I0)", lvl)
     ### load NewGuey2003 spectrum and scale it with the actual total solar
     ### irradiance. This will serve as top of atmosphere incoming irradiance
     ### to calculate spektral optical depths. 
-    tsi1au,etsi=_get_TSI(date,basepf,lvl+1)
-    Sc=1366.1# NewGuey2003 Solar constant
-    I0dat=np.loadtxt(basepf+"NewGuey2003.dat",
-                     converters={1:lambda s: float(s)/1000.})
-    I01=griddata(I0dat[:,0],I0dat[:,1],np.arange(200,1800))
-    I0=I01*(tsi1au/Sc)#scale I0 to solar activity
+    tsi1au, etsi = _get_TSI(date, basepf, lvl + 1)
+    Sc = 1366.1  # NewGuey2003 Solar constant
+    I0dat = np.loadtxt(basepf + "NewGuey2003.dat",
+                       converters={1: lambda s: float(s) / 1000.})
+    I01 = griddata(I0dat[:, 0], I0dat[:, 1], np.arange(200, 1800))
+    I0 = I01 * (tsi1au / Sc)  # scale I0 to solar activity
 
     ### The scaled spectrum have to be convolved with the spectral response
     ### function of each filter to calculate the true spectral irradiance at
     ### top of atmosphere as the sensor would measure through the filter at TOA.
-    I0s=np.zeros(len(wvls))
+    I0s = np.zeros(len(wvls))
     ### Standard deviation to other spectras vs NewGuey2003
-    E_I0=np.zeros(len(wvls))
-    E_I0[wvls>=1000]=1.1
-    E_I0[wvls<1000]=0.8
-    E_I0[wvls<700]=1.2
-    E_I0[wvls<400]=3.4
+    E_I0 = np.zeros(len(wvls))
+    E_I0[wvls >= 1000] = 1.1
+    E_I0[wvls < 1000] = 0.8
+    E_I0[wvls < 700] = 1.2
+    E_I0[wvls < 400] = 3.4
     try:
-        response=np.loadtxt(basepf+dbresponse,delimiter=',')
-        channels=response[0,1:]
-        response=response[1:,:]
+        response = np.loadtxt(basepf + dbresponse, delimiter=',')
+        channels = response[0, 1:]
+        response = response[1:, :]
     except:
         warnings.warn("There is no spectral calibration data.")
-        channels=[]
-        response=[]
-    for i,w in enumerate(wvls):
+        channels = []
+        response = []
+    for i, w in enumerate(wvls):
         if np.int64(w) in channels:
             ### Aquire the spectral response function centered on the centroid
             ### wavelength. Centering is nessesary for convolving the spectrum
-            res=griddata(response[:,0],response[:,1:][:,channels==np.int64(w)],
-                         np.arange(int(np.round(cwvls[i],0)-30),
-                                   int(np.round(cwvls[i],0)+30)),fill_value=0)
-            res=res.flatten()
-            I0i=np.convolve(I0,res/np.sum(res),'same')
-            I0s[i]=griddata(np.arange(200,1800),I0i,np.array(w))
+            res = griddata(response[:, 0], response[:, 1:][:, channels == np.int64(w)],
+                           np.arange(int(np.round(cwvls[i], 0) - 30),
+                                     int(np.round(cwvls[i], 0) + 30)), fill_value=0)
+            res = res.flatten()
+            I0i = np.convolve(I0, res / np.sum(res), 'same')
+            I0s[i] = griddata(np.arange(200, 1800), I0i, np.array(w))
         else:
-            if (assume==b'close' or assume=='close') and len(channels)!=0:
-                cw=channels[np.argmin(np.abs(channels-w))]
-                warnings.warn('Requested wavelength %.2f is not in response '%(w)
-                              +'dataset, calculations are performed now with '
-                              +'the next "close" wavelength ->%.2f in the '%(cw)
-                              +'dataset! Large errors may arise if the '
-                              +'wavelengths are to far from each other. Please '
-                              +'be aware of this or choose FWHM value for the '
-                              +'assume parameter for a better approximation.')
-                res=griddata(response[:,0],response[:,1:][:,channels==np.int64(cw)],
-                             np.arange(int(np.round(cwvls[i],0)-30),
-                                       int(np.round(cwvls[i],0)+30)),fill_value=0)
-                res=res.flatten()
-                I0i=np.convolve(I0,res/np.sum(res),'same')
-                I0s[i]=griddata(np.arange(200,1800),I0i,np.array(w))
+            if (assume == b'close' or assume == 'close') and len(channels) != 0:
+                cw = channels[np.argmin(np.abs(channels - w))]
+                warnings.warn('Requested wavelength %.2f is not in response ' % (w)
+                              + 'dataset, calculations are performed now with '
+                              + 'the next "close" wavelength ->%.2f in the ' % (cw)
+                              + 'dataset! Large errors may arise if the '
+                              + 'wavelengths are to far from each other. Please '
+                              + 'be aware of this or choose FWHM value for the '
+                              + 'assume parameter for a better approximation.')
+                res = griddata(response[:, 0], response[:, 1:][:, channels == np.int64(cw)],
+                               np.arange(int(np.round(cwvls[i], 0) - 30),
+                                         int(np.round(cwvls[i], 0) + 30)), fill_value=0)
+                res = res.flatten()
+                I0i = np.convolve(I0, res / np.sum(res), 'same')
+                I0s[i] = griddata(np.arange(200, 1800), I0i, np.array(w))
             else:
                 try:
-                    fwhm=np.float(assume)
+                    fwhm = np.float(assume)
                 except:
                     # print(assume)
                     raise ValueError("Input of assume not understood! "
-                                     +"Should be a number, or 'close'.")
-                sig=fwhm/(2.*np.sqrt(2.*np.log(2)))
-                res=np.trim_zeros(general_gaussian(np.int64(fwhm*10),1.5,sig),
-                                  trim='fb')
-                I0i=np.convolve(I0,res/np.sum(res),'same')
-                I0s[i]=griddata(np.arange(200,1800),I0i,np.array(w))
-                
-    eI0=I0s*etsi/Sc+E_I0*I0s/100.
-    SED=sp.earth_sun_distance(sp.datetime2julday(date))
-    I0s=I0s/(SED**2)
-    eI0=eI0/(SED**2)
-    print_status("..done!",lvl,style='g')
-    print_status("",lvl-1)
-    return I0s,eI0
+                                     + "Should be a number, or 'close'.")
+                sig = fwhm / (2. * np.sqrt(2. * np.log(2)))
+                res = np.trim_zeros(general_gaussian(np.int64(fwhm * 10), 1.5, sig),
+                                    trim='fb')
+                I0i = np.convolve(I0, res / np.sum(res), 'same')
+                I0s[i] = griddata(np.arange(200, 1800), I0i, np.array(w))
+
+    eI0 = I0s * etsi / Sc + E_I0 * I0s / 100.
+    SED = sp.earth_sun_distance(sp.datetime2julday(date))
+    I0s = I0s / (SED ** 2)
+    eI0 = eI0 / (SED ** 2)
+    print_status("..done!", lvl, style='g')
+    print_status("", lvl - 1)
+    return I0s, eI0

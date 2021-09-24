@@ -9,11 +9,9 @@ import sys
 import textwrap
 import warnings
 
-
-
 ### setting global intention level and tab
-glvl=0
-gtab='  |'
+glvl = 0
+gtab = '  |'
 
 
 class bcolors:
@@ -26,34 +24,39 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-if sys.version_info[0]==3:
+
+if sys.version_info[0] == 3:
     def _warning(
-        message,
-        category = UserWarning,
-        filename = '',
-        lineno = -1,
-        file='',
-        line=''):
+            message,
+            category=UserWarning,
+            filename='',
+            lineno=-1,
+            file='',
+            line=''):
         """Replace the default warnings.showwarning function to include in print_status
         """
         msg = warnings.WarningMessage(message, category, filename, lineno, file, line)
-        print_status('There is a warning!:',glvl,gtab,'>>','warning')
-        print_status(str(msg.message),glvl,gtab,'>>','warning')
+        print_status('There is a warning!:', glvl, gtab, '>>', 'warning')
+        print_status(str(msg.message), glvl, gtab, '>>', 'warning')
+
+
     warnings.showwarning = _warning
 else:
     def _warning(
-        message,
-        category = UserWarning,
-        filename = '',
-        lineno = -1):
+            message,
+            category=UserWarning,
+            filename='',
+            lineno=-1):
         """Replace the default warnings.showwarning function to include in print_status
         """
-        print_status('There is a warning!:',glvl,gtab,'>>','warning')
-        print_status(message[0],glvl,gtab,'>>','warning')
+        print_status('There is a warning!:', glvl, gtab, '>>', 'warning')
+        print_status(message[0], glvl, gtab, '>>', 'warning')
+
+
     warnings.showwarning = _warning
 
 
-def print_status(txt,lvl=0,tab='  |',pfx='',style='',end='',flush=False):
+def print_status(txt, lvl=0, tab='  |', pfx='', style='', end='', flush=False):
     r"""
     Print `txt` to stout with defined intention level for easy looks ;)
     
@@ -82,34 +85,32 @@ def print_status(txt,lvl=0,tab='  |',pfx='',style='',end='',flush=False):
                                 'header',
                                 'underline']
     """
-    if lvl<0:
+    if lvl < 0:
         return 0
     global glvl
-    glvl=lvl
-    offset=''
-    lines=textwrap.wrap(txt,width=69-lvl*len(tab)-len(pfx),break_long_words=False)
-    for i,l in enumerate(lines):
-        if i!=0:
-            offset='  '
-        if style.lower()=='blue' or style.lower()=='b':
-            pl=bcolors.OKBLUE+l+bcolors.ENDC
-        elif style.lower()=='green' or style.lower()=='g':
-            pl=bcolors.OKGREEN+l+bcolors.ENDC
-        elif style.lower()=='fail': 
-            pl=bcolors.FAIL+l+bcolors.ENDC
-        elif style.lower()=='warning':
-            pl=bcolors.WARNING+l+bcolors.ENDC 
-        elif style.lower()=='bold':
-            pl=bcolors.BOLD+l+bcolors.ENDC     
-        elif style.lower()=='header':
-            pl=bcolors.HEADER+l+bcolors.ENDC  
-        elif style.lower()=='underline':
-            pl=bcolors.UNDERLINE+l+bcolors.ENDC
+    glvl = lvl
+    offset = ''
+    lines = textwrap.wrap(txt, width=69 - lvl * len(tab) - len(pfx), break_long_words=False)
+    for i, l in enumerate(lines):
+        if i != 0:
+            offset = '  '
+        if style.lower() == 'blue' or style.lower() == 'b':
+            pl = bcolors.OKBLUE + l + bcolors.ENDC
+        elif style.lower() == 'green' or style.lower() == 'g':
+            pl = bcolors.OKGREEN + l + bcolors.ENDC
+        elif style.lower() == 'fail':
+            pl = bcolors.FAIL + l + bcolors.ENDC
+        elif style.lower() == 'warning':
+            pl = bcolors.WARNING + l + bcolors.ENDC
+        elif style.lower() == 'bold':
+            pl = bcolors.BOLD + l + bcolors.ENDC
+        elif style.lower() == 'header':
+            pl = bcolors.HEADER + l + bcolors.ENDC
+        elif style.lower() == 'underline':
+            pl = bcolors.UNDERLINE + l + bcolors.ENDC
         else:
-            pl=l
-        print(lvl*tab+pfx+offset+pl+end)
+            pl = l
+        print(lvl * tab + pfx + offset + pl + end)
         if flush:
             sys.stdout.flush()
     return 0
-
-

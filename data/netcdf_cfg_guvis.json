@@ -1,1222 +1,1549 @@
 {
-  "raw":{
-    "global":{
-      "dimensions":{
-        "time":{
-          "name":"t",
-          "size":null
+  "raw": {
+    "global": {
+      "dimensions": {
+        "time": {
+          "name": "t",
+          "size": null
         },
-        "bands":{
-          "name":"ch",
-          "size":19
-        }  
+        "bands": {
+          "name": "ch",
+          "size": 19
+        }
       },
-      "Title":           "Radiaton data observed with shadow band radiometer GUVis-3511",
-      "Institution":     "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
-      "Contact_person":  "Hartwig Deneke plus satellite group, sat@tropos.de",
-      "Source":          "Product derived from GUVis - {script_name}({script_version})",
-      "History":         "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
-      "Conventions":     "CF-1.7, if possible",
-      "Author":          "Jonas Witthuhn (witthuhn@tropos.de)",
-      "License":         "For non-commercial use only.",
-      "GUVis-3511_serial":"{serial}",
-      "GUVis-3511_TroposID":"ID:{troposID}",
-      "References":      "https://doi.org/10.5194/amt-10-709-2017"
+      "Title": "Radiaton data observed with shadow band radiometer GUVis-3511",
+      "Institution": "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
+      "Contact_person": "Hartwig Deneke plus satellite group, sat@tropos.de",
+      "Source": "Product derived from GUVis - {script_name}({script_version})",
+      "History": "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
+      "Conventions": "CF-1.7, if possible",
+      "Author": "Jonas Witthuhn (witthuhn@tropos.de)",
+      "License": "For non-commercial use only.",
+      "GUVis-3511_serial": "{serial}",
+      "GUVis-3511_TroposID": "ID:{troposID}",
+      "References": "https://doi.org/10.5194/amt-10-709-2017"
     },
-    "time":{
-      "createVariable":{
-        "name":         "time",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "time": {
+      "createVariable": {
+        "name": "time",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":  "time",
-      "long_name":      "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
+      "standard_name": "time",
+      "long_name": "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
       "units": "s",
-      "calendar":       "gregorian",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,5000000000000]
+      "calendar": "gregorian",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        5000000000000
+      ]
     },
-    "roll_guvis":{
-      "createVariable":{
-        "name":         "roll_guvis",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "roll_guvis": {
+      "createVariable": {
+        "name": "roll_guvis",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_roll_angle",
-      "long_name":"GUVis_roll_angle_positive_portside_up",
-      "notes":"GUVis 'portside' is the GPSbulb (black hat). This value is measuerd with the GUVis own accelerometer.",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       -180,
-      "valid_range":      [0,360000]
+      "standard_name": "platform_roll_angle",
+      "long_name": "GUVis_roll_angle_positive_portside_up",
+      "notes": "GUVis 'portside' is the GPSbulb (black hat). This value is measuerd with the GUVis own accelerometer.",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        360000
+      ]
     },
-    "roll":{
-      "createVariable":{
-        "name":         "roll",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "roll": {
+      "createVariable": {
+        "name": "roll",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_roll_angle",
-      "long_name":"platform_roll_angle_positive_portside_up",
-      "notes":"This angle describes the roll angle to use for alignment correction which may be different from roll_guvis if dataset is taken on a ship",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       -180,
-      "valid_range":      [0,360000]
+      "standard_name": "platform_roll_angle",
+      "long_name": "platform_roll_angle_positive_portside_up",
+      "notes": "This angle describes the roll angle to use for alignment correction which may be different from roll_guvis if dataset is taken on a ship",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        360000
+      ]
     },
-    "pitch_guvis":{
-      "createVariable":{
-        "name":         "pitch_guvis",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "pitch_guvis": {
+      "createVariable": {
+        "name": "pitch_guvis",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_pitch_angle",
-      "long_name":"GUVis_pitch_angle_positive_bow_up",
-      "notes":"GUVis 'bow' is indicated by the small screw on top of the radiometer. By default, the BioSHADE-bulb is placed on this side. This value is measuerd with the GUVis own accelerometer.",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       -180,
-      "valid_range":      [0,360000]
+      "standard_name": "platform_pitch_angle",
+      "long_name": "GUVis_pitch_angle_positive_bow_up",
+      "notes": "GUVis 'bow' is indicated by the small screw on top of the radiometer. By default, the BioSHADE-bulb is placed on this side. This value is measuerd with the GUVis own accelerometer.",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        360000
+      ]
     },
-    "pitch":{
-      "createVariable":{
-        "name":         "pitch",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "pitch": {
+      "createVariable": {
+        "name": "pitch",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_pitch_angle",
-      "long_name":"platform_pitch_angle_positive_bow_up",
-      "notes":"This angle describes the pitch angle to use for alignment correction which may be different from pitch_guvis if dataset is taken on a ship",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       -180,
-      "valid_range":      [0,360000]
+      "standard_name": "platform_pitch_angle",
+      "long_name": "platform_pitch_angle_positive_bow_up",
+      "notes": "This angle describes the pitch angle to use for alignment correction which may be different from pitch_guvis if dataset is taken on a ship",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        360000
+      ]
     },
-    "rad_tc":{
-      "createVariable":{
-        "name":         "rad",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "rad_tc": {
+      "createVariable": {
+        "name": "rad",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "long_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "notes":"The radiative flux is calibrated and tilt correctet to a horizontal plane from ship movement data. During shadowband sweeps (shmode) the sky as seen from sensor is partly occulted by this band.",
-      "units":"W m-2 nm-1"
+      "standard_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "long_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "notes": "The radiative flux is calibrated and tilt correctet to a horizontal plane from ship movement data. During shadowband sweeps (shmode) the sky as seen from sensor is partly occulted by this band.",
+      "units": "W m-2 nm-1"
     },
-    "rad":{
-      "createVariable":{
-        "name":         "rad",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "rad": {
+      "createVariable": {
+        "name": "rad",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "long_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "units":"W m-2 nm-1"
+      "standard_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "long_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "units": "W m-2 nm-1"
     },
-    "rad_c":{
-      "createVariable":{
-        "name":         "rad",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "rad_c": {
+      "createVariable": {
+        "name": "rad",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "long_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "notes":"The radiative flux is calibrated. But is measured on a tilted platform. see roll/pitch/yaw angles. During shadowband sweeps (shmode) the sky as seen from sensor is partly occulted by this band.",
-      "units":"W m-2 nm-1"
+      "standard_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "long_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "notes": "The radiative flux is calibrated. But is measured on a tilted platform. see roll/pitch/yaw angles. During shadowband sweeps (shmode) the sky as seen from sensor is partly occulted by this band.",
+      "units": "W m-2 nm-1"
     },
-    "rad_u":{
-      "createVariable":{
-        "name":         "rad",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "rad_u": {
+      "createVariable": {
+        "name": "rad",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "long_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "notes":"The radiative flux is uncalibrated and is measured on a tilted platform. see roll/pitch/yaw angles. During shadowband sweeps (shmode) the sky as seen from sensor is partly occulted by this band.",
-      "units":"V"
+      "standard_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "long_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "notes": "The radiative flux is uncalibrated and is measured on a tilted platform. see roll/pitch/yaw angles. During shadowband sweeps (shmode) the sky as seen from sensor is partly occulted by this band.",
+      "units": "V"
     },
-    "T_s":{
-      "createVariable":{
-        "name":         "T_s",
-        "dtype":        "f4",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          1
+    "T_s": {
+      "createVariable": {
+        "name": "T_s",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 1
       },
-      "standard_name":"sensor_temperature",
-      "long_name":"temperature of the GUVis sensor head",
-      "units":"C",
-      "scale_factor":     0.1,
-      "add_offset":       0.0,
-      "valid_range":      [0,800]
+      "standard_name": "sensor_temperature",
+      "long_name": "temperature of the GUVis sensor head",
+      "units": "C",
+      "scale_factor": 0.1,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        800
+      ]
     },
-    "gpstime":{
-      "createVariable":{
-        "name":         "time_gps",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "gpstime": {
+      "createVariable": {
+        "name": "time_gps",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":  "time",
-      "long_name":      "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
+      "standard_name": "time",
+      "long_name": "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
       "units": "s",
-      "notes":  "Measured from GUVis-GPS",
-      "calendar":       "gregorian",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,5000000000000]
+      "notes": "Measured from GUVis-GPS",
+      "calendar": "gregorian",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        5000000000000
+      ]
     },
-    "lat":{
-      "createVariable":{
-        "name":         "lat",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lat": {
+      "createVariable": {
+        "name": "lat",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"latitude",
-      "units":"degree_north",
-      "scale_factor":     0.0001,
-      "add_offset":       -90,
-      "valid_range":      [0,1800000]
+      "standard_name": "latitude",
+      "units": "degree_north",
+      "scale_factor": 0.0001,
+      "add_offset": -90,
+      "valid_range": [
+        0,
+        1800000
+      ]
     },
-    "lon":{
-      "createVariable":{
-        "name":         "lon",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lon": {
+      "createVariable": {
+        "name": "lon",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"longitude",
-      "units":"degree_east",
-      "scale_factor":     0.0001,
-      "add_offset":       -180,
-      "valid_range":      [0,3600000]
+      "standard_name": "longitude",
+      "units": "degree_east",
+      "scale_factor": 0.0001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        3600000
+      ]
     },
-    "satcount":{
-      "createVariable":{
-        "name":         "satcount",
-        "dtype":        "u2",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          null
+    "satcount": {
+      "createVariable": {
+        "name": "satcount",
+        "dtype": "u2",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": null
       },
-      "standard_name":"satellite_count",
-      "notes":"measured from GUVis-GPS",
-      "units":"#"
+      "standard_name": "satellite_count",
+      "notes": "measured from GUVis-GPS",
+      "units": "#"
     },
-    "shangle":{
-      "createVariable":{
-        "name":         "shangle",
-        "dtype":        "f4",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          2
+    "shangle": {
+      "createVariable": {
+        "name": "shangle",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "standard_name":"shadowband_rotation_angle",
-      "notes":"rotation angle of BioSHADE shadowband relative to Zero position (horizontal). By default BioSHADE settinges, 90 degrees equals zenith position.",
-      "units":"degree",
-      "scale_factor":   0.01,
-      "add_offset":     0.0,
-      "valid_range":    [0,24000]      
+      "standard_name": "shadowband_rotation_angle",
+      "notes": "rotation angle of BioSHADE shadowband relative to Zero position (horizontal). By default BioSHADE settinges, 90 degrees equals zenith position.",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        24000
+      ]
     },
-    "shmode":{
-      "createVariable":{
-        "name":         "shmode",
-        "dtype":        "S1",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          null
+    "shmode": {
+      "createVariable": {
+        "name": "shmode",
+        "dtype": "S1",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": null
       },
-      "standard_name":"BioSHADE_mode",
-      "notes":"BioSHADE shadowband mode:\nA: moving away from park position\nP: in park position\nT: moving towards park position\nZ: in zero position"
+      "standard_name": "BioSHADE_mode",
+      "notes": "BioSHADE shadowband mode:\nA: moving away from park position\nP: in park position\nT: moving towards park position\nZ: in zero position"
     },
-    "avcount":{
-      "createVariable":{
-        "name":         "avcount",
-        "dtype":        "i4",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          null
+    "avcount": {
+      "createVariable": {
+        "name": "avcount",
+        "dtype": "i4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": null
       },
-      "standard_name":"samples_averaged_per_measurement",
-      "units":"#"
+      "standard_name": "samples_averaged_per_measurement",
+      "units": "#"
     },
-    "zen":{
-      "createVariable":{
-          "name":         "zen",
-          "dtype":        "f4",
-          "dimensions":   ["t"],
-          "zlib":         true,
-          "lsd":          3
-        },
-        "standard_name":                  "solar_zenith_angle",
-        "units":                          "degree",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,18000]
-    },
-    "azi":{
-        "createVariable":{
-            "name":         "azi",
-            "dtype":        "f4",
-            "dimensions":   ["t"],
-            "zlib":         true,
-            "lsd":          3
-        },
-        "standard_name":                  "solar_azimuth_angle",
-        "long_name":                      "solar azimuth angle positive clockwise form north",
-        "units":                          "degree",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,36000]
-    },  
-    "channels":{
-        "createVariable":{
-            "name":         "channels",
-            "dtype":        "u4",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          null
-        },
-        "standard_name": "name_of_spectral_bands",
-        "units":                          "nm"
-    },
-    "channels_cwvl":{
-        "createVariable":{
-            "name":         "channels_cwvl",
-            "dtype":        "f4",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          2
-        },
-        "standard_name": "centroid_wavelength_of_spectral_bands",
-        "units":                          "nm",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,300000]
-    },
-    "channels_SNR":{
-    "createVariable":{
-            "name":         "channels_SNR",
-            "dtype":        "f8",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          3
-        },
-        "standard_name": "signal_noise_ratio",
-        "notes":        "signal noise ratio estimated for each channel during calibration",
-        "units":         "#"
-    },
-    "calibF":{
-        "createVariable":{
-            "name":         "calibF",
-            "dtype":        "f8",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          6
-        },
-        "standard_name": "calibration_factor",
-        "units":            "V uW-1 cm2 nm"
-    },
-    "yaw":{
-      "createVariable":{
-        "name":         "yaw",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "zen": {
+      "createVariable": {
+        "name": "zen",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_yaw_angle",
-      "long_name":"platform_yaw_angle_positive_clockwise_from_north",
-      "notes":"This angle describes the yaw angle to use for alignment correction which is aquired from ship or assigned manually",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,360000]
+      "standard_name": "solar_zenith_angle",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        18000
+      ]
     },
-    "E_ali":{
-      "createVariable":{
-        "name":         "E_ali",
-        "dtype":        "f4",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          4
+    "azi": {
+      "createVariable": {
+        "name": "azi",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"uncertainty_alignment",
-      "units":"W m-2 nm-1"
+      "standard_name": "solar_azimuth_angle",
+      "long_name": "solar azimuth angle positive clockwise form north",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        36000
+      ]
+    },
+    "channels": {
+      "createVariable": {
+        "name": "channels",
+        "dtype": "u4",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": null
+      },
+      "standard_name": "name_of_spectral_bands",
+      "units": "nm"
+    },
+    "channels_cwvl": {
+      "createVariable": {
+        "name": "channels_cwvl",
+        "dtype": "f4",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 2
+      },
+      "standard_name": "centroid_wavelength_of_spectral_bands",
+      "units": "nm",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        300000
+      ]
+    },
+    "channels_SNR": {
+      "createVariable": {
+        "name": "channels_SNR",
+        "dtype": "f8",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 3
+      },
+      "standard_name": "signal_noise_ratio",
+      "notes": "signal noise ratio estimated for each channel during calibration",
+      "units": "#"
+    },
+    "calibF": {
+      "createVariable": {
+        "name": "calibF",
+        "dtype": "f8",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 6
+      },
+      "standard_name": "calibration_factor",
+      "units": "V uW-1 cm2 nm"
+    },
+    "yaw": {
+      "createVariable": {
+        "name": "yaw",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
+      },
+      "standard_name": "platform_yaw_angle",
+      "long_name": "platform_yaw_angle_positive_clockwise_from_north",
+      "notes": "This angle describes the yaw angle to use for alignment correction which is aquired from ship or assigned manually",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        360000
+      ]
+    },
+    "E_ali": {
+      "createVariable": {
+        "name": "E_ali",
+        "dtype": "f4",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 4
+      },
+      "standard_name": "uncertainty_alignment",
+      "units": "W m-2 nm-1"
     }
   },
-  "pro":{
-    "global":{
-      "dimensions":{
-        "time":{
-          "name":"t",
-          "size":null
+  "pro": {
+    "global": {
+      "dimensions": {
+        "time": {
+          "name": "t",
+          "size": null
         },
-        "bands":{
-          "name":"ch",
-          "size":19
-        }  
+        "bands": {
+          "name": "ch",
+          "size": 19
+        }
       },
-      "Title":           "Processed Radiaton data observed with shadow band radiometer GUVis-3511",
-      "Institution":     "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
-      "Contact_person":  "Hartwig Deneke plus satellite group, sat@tropos.de",
-      "Source":          "Product derived from GUVis - {script_name}({script_version})",
-      "History":         "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
-      "Conventions":     "CF-1.7, if possible",
-      "Author":          "Jonas Witthuhn (witthuhn@tropos.de)",
-      "License":         "For non-commercial use only.",
-      "GUVis-3511_serial":"{serial}",
-      "GUVis-3511_TroposID":"ID:{troposID}",
-      "References":      "https://doi.org/10.5194/amt-10-709-2017"
+      "Title": "Processed Radiaton data observed with shadow band radiometer GUVis-3511",
+      "Institution": "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
+      "Contact_person": "Hartwig Deneke plus satellite group, sat@tropos.de",
+      "Source": "Product derived from GUVis - {script_name}({script_version})",
+      "History": "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
+      "Conventions": "CF-1.7, if possible",
+      "Author": "Jonas Witthuhn (witthuhn@tropos.de)",
+      "License": "For non-commercial use only.",
+      "GUVis-3511_serial": "{serial}",
+      "GUVis-3511_TroposID": "ID:{troposID}",
+      "References": "https://doi.org/10.5194/amt-10-709-2017"
     },
-    "time":{
-      "createVariable":{
-        "name":         "time",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "time": {
+      "createVariable": {
+        "name": "time",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":  "time",
-      "long_name":      "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
+      "standard_name": "time",
+      "long_name": "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
       "units": "s",
       "notes": "The time is measured exactly at the time of full occultation of the sun as seen from the sensor during one sweep of the shadowband.",
-      "calendar":       "gregorian",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,5000000000000]
+      "calendar": "gregorian",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        5000000000000
+      ]
     },
-    "Iglo":{
-      "createVariable":{
-        "name":         "Iglo",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "Iglo": {
+      "createVariable": {
+        "name": "Iglo",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "long_name":"global_surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "notes":"Calibrated global spectral irradiace measured between sweeps, interpolated to the time of full occultation of the sun during one sweep.",
-      "units":"W m-2 nm-1"
+      "standard_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "long_name": "global_surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "notes": "Calibrated global spectral irradiace measured between sweeps, interpolated to the time of full occultation of the sun during one sweep.",
+      "units": "W m-2 nm-1"
     },
-    "Idir":{
-      "createVariable":{
-        "name":         "Idir",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "Idir": {
+      "createVariable": {
+        "name": "Idir",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "long_name":"direct_surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "notes":"Calibrated direct spectral irradiace calculated from measured irradiance during one sweep.",
-      "units":"W m-2 nm-1"
+      "standard_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "long_name": "direct_surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "notes": "Calibrated direct spectral irradiace calculated from measured irradiance during one sweep.",
+      "units": "W m-2 nm-1"
     },
-    "Idif":{
-      "createVariable":{
-        "name":         "Idif",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "Idif": {
+      "createVariable": {
+        "name": "Idif",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "long_name":"diffuse_surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
-      "notes":"Calibrated diffuse spectral irradiace calculated from measured irradiance during one sweep and interpolated to the time of full occultation of the sun during one sweep.",
-      "units":"W m-2 nm-1"
+      "standard_name": "surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "long_name": "diffuse_surface_downwelling_radiative_flux_per_unit_wavelength_in_air",
+      "notes": "Calibrated diffuse spectral irradiace calculated from measured irradiance during one sweep and interpolated to the time of full occultation of the sun during one sweep.",
+      "units": "W m-2 nm-1"
     },
-    "T_s":{
-      "createVariable":{
-        "name":         "T_s",
-        "dtype":        "f4",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          1
+    "T_s": {
+      "createVariable": {
+        "name": "T_s",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 1
       },
-      "standard_name":"sensor_temperature",
-      "long_name":"temperature of the GUVis sensor head",
-      "units":"C",
-      "scale_factor":     0.1,
-      "add_offset":       0.0,
-      "valid_range":      [0,800]
+      "standard_name": "sensor_temperature",
+      "long_name": "temperature of the GUVis sensor head",
+      "units": "C",
+      "scale_factor": 0.1,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        800
+      ]
     },
-    "lat":{
-      "createVariable":{
-        "name":         "lat",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lat": {
+      "createVariable": {
+        "name": "lat",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"latitude",
-      "units":"degree_north",
-      "scale_factor":     0.0001,
-      "add_offset":       -90,
-      "valid_range":      [0,1800000]
+      "standard_name": "latitude",
+      "units": "degree_north",
+      "scale_factor": 0.0001,
+      "add_offset": -90,
+      "valid_range": [
+        0,
+        1800000
+      ]
     },
-    "lon":{
-      "createVariable":{
-        "name":         "lon",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lon": {
+      "createVariable": {
+        "name": "lon",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"longitude",
-      "units":"degree_east",
-      "scale_factor":     0.0001,
-      "add_offset":       -180,
-      "valid_range":      [0,3600000]
+      "standard_name": "longitude",
+      "units": "degree_east",
+      "scale_factor": 0.0001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        3600000
+      ]
     },
-    "shangle":{
-      "createVariable":{
-        "name":         "shangle",
-        "dtype":        "f4",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          2
+    "shangle": {
+      "createVariable": {
+        "name": "shangle",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "standard_name":"shadowband_rotation_angle",
-      "notes":"rotation angle of BioSHADE shadowband relative to Zero position (horizontal). By default BioSHADE settinges, 90 degrees equals zenith position.",
-      "units":"degree",
-      "scale_factor":   0.01,
-      "add_offset":     0.0,
-      "valid_range":    [0,24000]      
+      "standard_name": "shadowband_rotation_angle",
+      "notes": "rotation angle of BioSHADE shadowband relative to Zero position (horizontal). By default BioSHADE settinges, 90 degrees equals zenith position.",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        24000
+      ]
     },
-    "zen":{
-        "createVariable":{
-            "name":         "zen",
-            "dtype":        "f4",
-            "dimensions":   ["t"],
-            "zlib":         true,
-            "lsd":          3
-        },
-        "standard_name":                  "solar_zenith_angle",
-        "units":                          "degree",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,18000]
-    },
-    "azi":{
-        "createVariable":{
-            "name":         "azi",
-            "dtype":        "f4",
-            "dimensions":   ["t"],
-            "zlib":         true,
-            "lsd":          3
-        },
-        "standard_name":                  "solar_azimuth_angle",
-        "long_name":                      "solar azimuth angle positive clockwise form north",
-        "units":                          "degree",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,36000]
-    },  
-    "channels":{
-        "createVariable":{
-            "name":         "channels",
-            "dtype":        "u4",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          null
-        },
-        "standard_name": "name_of_spectral_bands",
-        "units":                          "nm"
-
-    },
-    "channels_cwvl":{
-        "createVariable":{
-            "name":         "channels_cwvl",
-            "dtype":        "f4",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          2
-        },
-        "standard_name": "centroid_wavelength_of_spectral_bands",
-        "units":                          "nm",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,300000]
-    },
-    "calibF":{
-        "createVariable":{
-            "name":         "calibF",
-            "dtype":        "f8",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          6
-        },
-        "standard_name": "calibration_factor",
-        "units":            "V uW-1 cm2 nm"
-    },
-    "yaw":{
-      "createVariable":{
-        "name":         "yaw",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "zen": {
+      "createVariable": {
+        "name": "zen",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_yaw_angle",
-      "long_name":"platform_yaw_angle_positive_clockwise_from_north",
-      "notes":"This angle describes the yaw angle to use for alignment correction which is aquired from ship or assigned manually",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,360000]
+      "standard_name": "solar_zenith_angle",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        18000
+      ]
     },
-    "E_ali":{
-      "createVariable":{
-        "name":         "E_ali",
-        "dtype":        "f4",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          4
+    "azi": {
+      "createVariable": {
+        "name": "azi",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"uncertainty_alignment",
-      "notes":"Uncertainty is calculated during tilt correction.",
-      "units":"W m-2 nm-1"
+      "standard_name": "solar_azimuth_angle",
+      "long_name": "solar azimuth angle positive clockwise form north",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        36000
+      ]
     },
-    "E_noise":{
-      "createVariable":{
-        "name":         "E_noise",
-        "dtype":        "f4",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          4
+    "channels": {
+      "createVariable": {
+        "name": "channels",
+        "dtype": "u4",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": null
       },
-      "standard_name":"uncertainty_noise",
-      "notes":"Uncertainty estimates the effect of noise on the extraction of Idir and Idif, therefore is not affecting Iglo.",
-      "units":"%"
+      "standard_name": "name_of_spectral_bands",
+      "units": "nm"
     },
-    "E_ext":{
-      "createVariable":{
-        "name":         "E_ext",
-        "dtype":        "f4",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "channels_cwvl": {
+      "createVariable": {
+        "name": "channels_cwvl",
+        "dtype": "f4",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "standard_name":"uncertainty_extrapolation",
-      "notes":"Uncertainty is estimated by the extrapolation routine, to calculate Idir and Idif from sweep data. Therefore this is not affecting Iglo.",
-      "units":"%"
+      "standard_name": "centroid_wavelength_of_spectral_bands",
+      "units": "nm",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        300000
+      ]
+    },
+    "calibF": {
+      "createVariable": {
+        "name": "calibF",
+        "dtype": "f8",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 6
+      },
+      "standard_name": "calibration_factor",
+      "units": "V uW-1 cm2 nm"
+    },
+    "yaw": {
+      "createVariable": {
+        "name": "yaw",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
+      },
+      "standard_name": "platform_yaw_angle",
+      "long_name": "platform_yaw_angle_positive_clockwise_from_north",
+      "notes": "This angle describes the yaw angle to use for alignment correction which is aquired from ship or assigned manually",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        360000
+      ]
+    },
+    "E_ali": {
+      "createVariable": {
+        "name": "E_ali",
+        "dtype": "f4",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 4
+      },
+      "standard_name": "uncertainty_alignment",
+      "notes": "Uncertainty is calculated during tilt correction.",
+      "units": "W m-2 nm-1"
+    },
+    "E_noise": {
+      "createVariable": {
+        "name": "E_noise",
+        "dtype": "f4",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 4
+      },
+      "standard_name": "uncertainty_noise",
+      "notes": "Uncertainty estimates the effect of noise on the extraction of Idir and Idif, therefore is not affecting Iglo.",
+      "units": "%"
+    },
+    "E_ext": {
+      "createVariable": {
+        "name": "E_ext",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
+      },
+      "standard_name": "uncertainty_extrapolation",
+      "notes": "Uncertainty is estimated by the extrapolation routine, to calculate Idir and Idif from sweep data. Therefore this is not affecting Iglo.",
+      "units": "%"
     }
   },
-  "aod":{
-    "global":{
-      "dimensions":{
-        "time":{
-          "name":"t",
-          "size":null
+  "aod": {
+    "global": {
+      "dimensions": {
+        "time": {
+          "name": "t",
+          "size": null
         },
-        "bands":{
-          "name":"ch",
-          "size":18
-        } 
+        "bands": {
+          "name": "ch",
+          "size": 18
+        }
       },
-      "Title":           "Aerosol optical depth data measured with the shadow band radiometer GUVis-3511",
-      "Institution":     "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
-      "Contact_person":  "Hartwig Deneke plus satellite group, sat@tropos.de",
-      "Source":          "Product derived from GUVis - {script_name}({script_version})",
-      "History":         "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
-      "Instrument":      "{ins_instrument}",
-      "Conventions":     "CF-1.7, if possible",
-      "Author":          "Jonas Witthuhn (witthuhn@tropos.de)",
-      "License":         "For non-commercial use only.",
-      "GUVis-3511_serial":"{serial}",
-      "GUVis-3511_TroposID":"ID:{troposID}",
-      "References":      "https://doi.org/10.5194/amt-10-709-2017"
+      "Title": "Aerosol optical depth data measured with the shadow band radiometer GUVis-3511",
+      "Institution": "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
+      "Contact_person": "Hartwig Deneke plus satellite group, sat@tropos.de",
+      "Source": "Product derived from GUVis - {script_name}({script_version})",
+      "History": "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
+      "Instrument": "{ins_instrument}",
+      "Conventions": "CF-1.7, if possible",
+      "Author": "Jonas Witthuhn (witthuhn@tropos.de)",
+      "License": "For non-commercial use only.",
+      "GUVis-3511_serial": "{serial}",
+      "GUVis-3511_TroposID": "ID:{troposID}",
+      "References": "https://doi.org/10.5194/amt-10-709-2017"
     },
-    "time":{
-      "createVariable":{
-        "name":         "time",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "time": {
+      "createVariable": {
+        "name": "time",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":  "time",
-      "long_name":      "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
+      "standard_name": "time",
+      "long_name": "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
       "units": "s",
-      "calendar":       "gregorian",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,5000000000000]
+      "calendar": "gregorian",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        5000000000000
+      ]
     },
-    "lat":{
-      "createVariable":{
-        "name":         "lat",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lat": {
+      "createVariable": {
+        "name": "lat",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"latitude",
-      "units":"degree_north",
-      "scale_factor":     0.0001,
-      "add_offset":       -90,
-      "valid_range":      [0,1800000]
+      "standard_name": "latitude",
+      "units": "degree_north",
+      "scale_factor": 0.0001,
+      "add_offset": -90,
+      "valid_range": [
+        0,
+        1800000
+      ]
     },
-    "lon":{
-      "createVariable":{
-        "name":         "lon",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lon": {
+      "createVariable": {
+        "name": "lon",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"longitude",
-      "units":"degree_east",
-      "scale_factor":     0.0001,
-      "add_offset":       -180,
-      "valid_range":      [0,3600000]
+      "standard_name": "longitude",
+      "units": "degree_east",
+      "scale_factor": 0.0001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        3600000
+      ]
     },
-    "aod":{
-      "createVariable":{
-        "name":         "aod",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "aod": {
+      "createVariable": {
+        "name": "aod",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth_due_to_aerosol",
-      "long_name":"spectral atmosphere_optical_thickness_due_to_aerosol scaled to a vertical column",
-      "notes":"The scaling to the vertical column is done with AOT*cos(solar_zenith_angle)",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth_due_to_aerosol",
+      "long_name": "spectral atmosphere_optical_thickness_due_to_aerosol scaled to a vertical column",
+      "notes": "The scaling to the vertical column is done with AOT*cos(solar_zenith_angle)",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "aot":{
-      "createVariable":{
-        "name":         "aot",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "aot": {
+      "createVariable": {
+        "name": "aot",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_thickness_due_to_aerosol",
-      "long_name":"spectral atmosphere_optical_thickness_due_to_aerosol on path of radiation",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_thickness_due_to_aerosol",
+      "long_name": "spectral atmosphere_optical_thickness_due_to_aerosol on path of radiation",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "od":{
-      "createVariable":{
-        "name":         "od",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "od": {
+      "createVariable": {
+        "name": "od",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth",
-      "long_name":"spectral total atmosphere_optical_thickness on vertical column",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth",
+      "long_name": "spectral total atmosphere_optical_thickness on vertical column",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "od_ray":{
-      "createVariable":{
-        "name":         "od_ray",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "od_ray": {
+      "createVariable": {
+        "name": "od_ray",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth",
-      "long_name":"spectral atmosphere_optical_thickness due to rayleigh scattering on vertical column",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth",
+      "long_name": "spectral atmosphere_optical_thickness due to rayleigh scattering on vertical column",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "od_o3":{
-      "createVariable":{
-        "name":         "od_o3",
-        "dtype":        "f8",
-        "dimensions":   ["ch"],
-        "zlib":         true,
-        "lsd":          5
+    "od_o3": {
+      "createVariable": {
+        "name": "od_o3",
+        "dtype": "f8",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth",
-      "long_name":"spectral atmosphere_optical_thickness due to ozone absorption on vertical column",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth",
+      "long_name": "spectral atmosphere_optical_thickness due to ozone absorption on vertical column",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "od_no2":{
-      "createVariable":{
-        "name":         "od_no2",
-        "dtype":        "f8",
-        "dimensions":   ["ch"],
-        "zlib":         true,
-        "lsd":          5
+    "od_no2": {
+      "createVariable": {
+        "name": "od_no2",
+        "dtype": "f8",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth",
-      "long_name":"spectral atmosphere_optical_thickness due to NO2 absorption on vertical column",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth",
+      "long_name": "spectral atmosphere_optical_thickness due to NO2 absorption on vertical column",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "od_h2o":{
-      "createVariable":{
-        "name":         "od_h2o",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "od_h2o": {
+      "createVariable": {
+        "name": "od_h2o",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth",
-      "long_name":"spectral atmosphere_optical_thickness due to absoption from water/water vapor on vertical column",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth",
+      "long_name": "spectral atmosphere_optical_thickness due to absoption from water/water vapor on vertical column",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "od_ch4":{
-      "createVariable":{
-        "name":         "od_ch4",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "od_ch4": {
+      "createVariable": {
+        "name": "od_ch4",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth",
-      "long_name":"spectral atmosphere_optical_thickness due to CH4 absorption on vertical column",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth",
+      "long_name": "spectral atmosphere_optical_thickness due to CH4 absorption on vertical column",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "od_co2":{
-      "createVariable":{
-        "name":         "od_co2",
-        "dtype":        "f8",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          5
+    "od_co2": {
+      "createVariable": {
+        "name": "od_co2",
+        "dtype": "f8",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 5
       },
-      "standard_name":"atmosphere_optical_depth",
-      "long_name":"spectral atmosphere_optical_thickness due to CO2 absorption on vertical column",
-      "units":"#",
-      "scale_factor":     0.00001,
-      "add_offset":       0.0,
-      "valid_range":      [0,1000000]
+      "standard_name": "atmosphere_optical_depth",
+      "long_name": "spectral atmosphere_optical_thickness due to CO2 absorption on vertical column",
+      "units": "#",
+      "scale_factor": 0.00001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        1000000
+      ]
     },
-    "o3DU":{
-      "createVariable":{
-        "name":         "o3DU",
-        "dtype":        "f8",
-        "dimensions":   [],
-        "zlib":         true,
-        "lsd":          null
+    "o3DU": {
+      "createVariable": {
+        "name": "o3DU",
+        "dtype": "f8",
+        "dimensions": [],
+        "zlib": true,
+        "lsd": null
       },
-      "standard_name":"column_ozone_burden",
-      "units":"DU"
+      "standard_name": "column_ozone_burden",
+      "units": "DU"
     },
-    "no2DU":{
-      "createVariable":{
-        "name":         "no2DU",
-        "dtype":        "f8",
-        "dimensions":   [],
-        "zlib":         true,
-        "lsd":          null
+    "no2DU": {
+      "createVariable": {
+        "name": "no2DU",
+        "dtype": "f8",
+        "dimensions": [],
+        "zlib": true,
+        "lsd": null
       },
-      "standard_name":"column_no2_burden",
-      "units":"DU"
+      "standard_name": "column_no2_burden",
+      "units": "DU"
     },
-    "E_aod":{
-      "createVariable":{
-        "name":         "E_aod",
-        "dtype":        "f4",
-        "dimensions":   ["t","ch"],
-        "zlib":         true,
-        "lsd":          null
+    "E_aod": {
+      "createVariable": {
+        "name": "E_aod",
+        "dtype": "f4",
+        "dimensions": [
+          "t",
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": null
       },
-      "standard_name":"uncertainty_aod",
-      "units":"#"
+      "standard_name": "uncertainty_aod",
+      "units": "#"
     },
-    "P":{
-      "createVariable":{
-          "name":         "P",
-          "dtype":        "f8",
-          "dimensions":   ["t"],
-          "zlib":         true,
-          "lsd":          2
+    "P": {
+      "createVariable": {
+        "name": "P",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "units":    "hPA",
+      "units": "hPA",
       "standard_name": "air_pressure",
       "long_name": "pressure of surounding air at surface"
     },
-    "zen":{
-      "createVariable":{
-          "name":         "zen",
-          "dtype":        "f4",
-          "dimensions":   ["t"],
-          "zlib":         true,
-          "lsd":          3
-        },
-        "standard_name":                  "solar_zenith_angle",
-        "units":                          "degree",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,18000]
+    "zen": {
+      "createVariable": {
+        "name": "zen",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
+      },
+      "standard_name": "solar_zenith_angle",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        18000
+      ]
     },
-    "azi":{
-        "createVariable":{
-            "name":         "azi",
-            "dtype":        "f4",
-            "dimensions":   ["t"],
-            "zlib":         true,
-            "lsd":          3
-        },
-        "standard_name":                  "solar_azimuth_angle",
-        "long_name":                      "solar azimuth angle positive clockwise form north",
-        "units":                          "degree",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,36000]
-    },  
-    "channels":{
-        "createVariable":{
-            "name":         "channels",
-            "dtype":        "u4",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          null
-        },
-        "standard_name": "name_of_spectral_bands",
-        "units":                          "nm",
-        "scale_factor":     0.0,
-        "add_offset":       0.0,
-        "valid_range":      [0,3000]
+    "azi": {
+      "createVariable": {
+        "name": "azi",
+        "dtype": "f4",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
+      },
+      "standard_name": "solar_azimuth_angle",
+      "long_name": "solar azimuth angle positive clockwise form north",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        36000
+      ]
     },
-    "channels_cwvl":{
-        "createVariable":{
-            "name":         "channels_cwvl",
-            "dtype":        "f4",
-            "dimensions":   ["ch"],
-            "zlib":         true,
-            "lsd":          2
-        },
-        "standard_name": "centroid_wavelength_of_spectral_bands",
-        "units":                          "nm",
-        "scale_factor":     0.01,
-        "add_offset":       0.0,
-        "valid_range":      [0,300000]
+    "channels": {
+      "createVariable": {
+        "name": "channels",
+        "dtype": "u4",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": null
+      },
+      "standard_name": "name_of_spectral_bands",
+      "units": "nm",
+      "scale_factor": 0.0,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        3000
+      ]
+    },
+    "channels_cwvl": {
+      "createVariable": {
+        "name": "channels_cwvl",
+        "dtype": "f4",
+        "dimensions": [
+          "ch"
+        ],
+        "zlib": true,
+        "lsd": 2
+      },
+      "standard_name": "centroid_wavelength_of_spectral_bands",
+      "units": "nm",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        300000
+      ]
     }
   },
-  "ins":{
-    "global":{
-      "dimensions":{
-        "time":{
-          "name":"t",
-          "size":null
-        } 
+  "ins": {
+    "global": {
+      "dimensions": {
+        "time": {
+          "name": "t",
+          "size": null
+        }
       },
-      "Title":           "Data of inertial navigation system (INS) measured during ship cruises with the shadow band radiometer GUVis-3511",
-      "Institution":     "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
-      "Contact_person":  "Hartwig Deneke plus satellite group, sat@tropos.de",
-      "Source":          "Product derived from GUVis - {script_name}({script_version})",
-      "History":         "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
-      "Instrument":      "{ins_instrument}",
-      "Conventions":     "CF-1.7, if possible",
-      "Author":          "Jonas Witthuhn (witthuhn@tropos.de)",
-      "License":         "For non-commercial use only."
+      "Title": "Data of inertial navigation system (INS) measured during ship cruises with the shadow band radiometer GUVis-3511",
+      "Institution": "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
+      "Contact_person": "Hartwig Deneke plus satellite group, sat@tropos.de",
+      "Source": "Product derived from GUVis - {script_name}({script_version})",
+      "History": "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
+      "Instrument": "{ins_instrument}",
+      "Conventions": "CF-1.7, if possible",
+      "Author": "Jonas Witthuhn (witthuhn@tropos.de)",
+      "License": "For non-commercial use only."
     },
-    "time":{
-      "createVariable":{
-        "name":         "time",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "time": {
+      "createVariable": {
+        "name": "time",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":  "time",
-      "long_name":      "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
+      "standard_name": "time",
+      "long_name": "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
       "units": "s",
-      "calendar":       "gregorian",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,5000000000000]
+      "calendar": "gregorian",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        5000000000000
+      ]
     },
-    "lat":{
-      "createVariable":{
-        "name":         "lat",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lat": {
+      "createVariable": {
+        "name": "lat",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"latitude",
-      "units":"degree_north",
-      "scale_factor":     0.0001,
-      "add_offset":       -90,
-      "valid_range":      [0,1800000]
+      "standard_name": "latitude",
+      "units": "degree_north",
+      "scale_factor": 0.0001,
+      "add_offset": -90,
+      "valid_range": [
+        0,
+        1800000
+      ]
     },
-    "lon":{
-      "createVariable":{
-        "name":         "lon",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lon": {
+      "createVariable": {
+        "name": "lon",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"longitude",
-      "units":"degree_east",
-      "scale_factor":     0.0001,
-      "add_offset":       -180,
-      "valid_range":      [0,3600000]
+      "standard_name": "longitude",
+      "units": "degree_east",
+      "scale_factor": 0.0001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        3600000
+      ]
     },
-    "yaw":{
-      "createVariable":{
-        "name":         "yaw",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "yaw": {
+      "createVariable": {
+        "name": "yaw",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_yaw_angle",
-      "long_name":"platform_yaw_angle_positive_clockwise_from_north",
-      "notes":"Some INS-systems may define the yaw angle 'anticlockwise', but if defined properly in script config, this angle always defined 'clockwise'",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,360000]
+      "standard_name": "platform_yaw_angle",
+      "long_name": "platform_yaw_angle_positive_clockwise_from_north",
+      "notes": "Some INS-systems may define the yaw angle 'anticlockwise', but if defined properly in script config, this angle always defined 'clockwise'",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        360000
+      ]
     },
-    "roll":{
-      "createVariable":{
-        "name":         "roll",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "roll": {
+      "createVariable": {
+        "name": "roll",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_roll_angle",
-      "long_name":"platform_roll_angle_positive_portside_up",
-      "notes":"Some INS-systems may define the roll angle 'protside_down', but if defined properly in script config, this angle always defined 'portside_up'",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       -180,
-      "valid_range":      [0,360000]
+      "standard_name": "platform_roll_angle",
+      "long_name": "platform_roll_angle_positive_portside_up",
+      "notes": "Some INS-systems may define the roll angle 'protside_down', but if defined properly in script config, this angle always defined 'portside_up'",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        360000
+      ]
     },
-    "pitch":{
-      "createVariable":{
-        "name":         "pitch",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "pitch": {
+      "createVariable": {
+        "name": "pitch",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":"platform_pitch_angle",
-      "long_name":"platform_pitch_angle_positive_bow_up",
-      "notes":"Some INS-systems may define the pitch angle 'bow_down', but if defined properly in script config, this angle always defined 'bow_up'",
-      "units":"degrees",
-      "scale_factor":     0.001,
-      "add_offset":       -180,
-      "valid_range":      [0,360000]
+      "standard_name": "platform_pitch_angle",
+      "long_name": "platform_pitch_angle_positive_bow_up",
+      "notes": "Some INS-systems may define the pitch angle 'bow_down', but if defined properly in script config, this angle always defined 'bow_up'",
+      "units": "degrees",
+      "scale_factor": 0.001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        360000
+      ]
     }
   },
-  "met":{
-    "global":{
-      "dimensions":{
-        "time":{
-          "name":"t",
-          "size":null
-        } 
+  "met": {
+    "global": {
+      "dimensions": {
+        "time": {
+          "name": "t",
+          "size": null
+        }
       },
-      "Title":           "Meteorological data measured close to shadow band radiometer GUVis-3511",
-      "Institution":     "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
-      "Contact_person":  "Hartwig Deneke plus satellite group, sat@tropos.de",
-      "Source":          "Product derived from GUVis - {script_name}({script_version})",
-      "History":         "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
-      "Instrument":     "{met_instrument}",
-      "Conventions":     "CF-1.7, if possible",
-      "Author":          "Jonas Witthuhn (witthuhn@tropos.de)",
-      "License":         "For non-commercial use only."
+      "Title": "Meteorological data measured close to shadow band radiometer GUVis-3511",
+      "Institution": "Leibniz Institute for Tropospheric Research (TROPOS), Leipzig, Germany.",
+      "Contact_person": "Hartwig Deneke plus satellite group, sat@tropos.de",
+      "Source": "Product derived from GUVis - {script_name}({script_version})",
+      "History": "Data file generated at {campaign} at {dt:%Y-%m-%d %H:%M:%S Z} by user {user}",
+      "Instrument": "{met_instrument}",
+      "Conventions": "CF-1.7, if possible",
+      "Author": "Jonas Witthuhn (witthuhn@tropos.de)",
+      "License": "For non-commercial use only."
     },
-    "time":{
-      "createVariable":{
-        "name":         "time",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          3
+    "time": {
+      "createVariable": {
+        "name": "time",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 3
       },
-      "standard_name":  "time",
-      "long_name":      "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
+      "standard_name": "time",
+      "long_name": "seconds since UNIX standard epoc (1970-01-01T00:00:00)",
       "units": "s",
-      "calendar":       "gregorian",
-      "scale_factor":     0.001,
-      "add_offset":       0.0,
-      "valid_range":      [0,5000000000000]
+      "calendar": "gregorian",
+      "scale_factor": 0.001,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        5000000000000
+      ]
     },
-    "lat":{
-      "createVariable":{
-        "name":         "lat",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lat": {
+      "createVariable": {
+        "name": "lat",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"latitude",
-      "units":"degree_north",
-      "scale_factor":     0.0001,
-      "add_offset":       -90,
-      "valid_range":      [0,1800000]
+      "standard_name": "latitude",
+      "units": "degree_north",
+      "scale_factor": 0.0001,
+      "add_offset": -90,
+      "valid_range": [
+        0,
+        1800000
+      ]
     },
-    "lon":{
-      "createVariable":{
-        "name":         "lon",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          4
+    "lon": {
+      "createVariable": {
+        "name": "lon",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 4
       },
-      "standard_name":"longitude",
-      "units":"degree_east",
-      "scale_factor":     0.0001,
-      "add_offset":       -180,
-      "valid_range":      [0,3600000]
+      "standard_name": "longitude",
+      "units": "degree_east",
+      "scale_factor": 0.0001,
+      "add_offset": -180,
+      "valid_range": [
+        0,
+        3600000
+      ]
     },
     "T": {
-      "createVariable":{
-          "name":         "T",
-          "dtype":        "f8",
-          "dimensions":   ["t"],
-          "zlib":         true,
-          "lsd":          2
+      "createVariable": {
+        "name": "T",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "units":    "C",
+      "units": "C",
       "standard_name": "air_temperature",
       "long_name": "temperature of surounding air"
     },
     "T_w": {
-      "createVariable":{
-          "name":         "T_w",
-          "dtype":        "f8",
-          "dimensions":   ["t"],
-          "zlib":         true,
-          "lsd":          2
+      "createVariable": {
+        "name": "T_w",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "units":    "C",
+      "units": "C",
       "standard_name": "sea_water_temperature",
       "long_name": "temperature of sea water as measured from ship"
     },
-    "RH":{
-      "createVariable":{
-          "name":         "RH",
-          "dtype":        "f8",
-          "dimensions":   ["t"],
-          "zlib":         true,
-          "lsd":          2
+    "RH": {
+      "createVariable": {
+        "name": "RH",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "units":    "%",
+      "units": "%",
       "standard_name": "relative_humidity",
-      "long_name": "realtive humidity of surounding air"        
+      "long_name": "realtive humidity of surounding air"
     },
-    "P":{
-      "createVariable":{
-          "name":         "P",
-          "dtype":        "f8",
-          "dimensions":   ["t"],
-          "zlib":         true,
-          "lsd":          2
+    "P": {
+      "createVariable": {
+        "name": "P",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "units":    "hPA",
+      "units": "hPA",
       "standard_name": "air_pressure",
       "long_name": "pressure of surounding air"
     },
-    "WD_rel":{
-      "createVariable":{
-        "name":         "WD_rel",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          2
+    "WD_rel": {
+      "createVariable": {
+        "name": "WD_rel",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "standard_name":  "wind_from_direction",
-      "long_name":       "relative_wind_from_direction",
-      "notes":          "measured relative to ship heading, clockwise positive",
-      "units":          "degree",
-      "scale_factor":     0.01,
-      "add_offset":       0.0,
-      "valid_range":      [0,36000]
+      "standard_name": "wind_from_direction",
+      "long_name": "relative_wind_from_direction",
+      "notes": "measured relative to ship heading, clockwise positive",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        36000
+      ]
     },
-    "WD_tru":{
-      "createVariable":{
-        "name":         "WD_tru",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          2
+    "WD_tru": {
+      "createVariable": {
+        "name": "WD_tru",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "standard_name":  "wind_from_direction",
-      "long_name":       "true_wind_from_direction",
-      "notes":           "positive clockwise form north",
-      "units":          "degree",
-      "scale_factor":     0.01,
-      "add_offset":       0.0,
-      "valid_range":      [0,36000]
+      "standard_name": "wind_from_direction",
+      "long_name": "true_wind_from_direction",
+      "notes": "positive clockwise form north",
+      "units": "degree",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        36000
+      ]
     },
-    "WV_rel":{
-      "createVariable":{
-        "name":         "WV_rel",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          2
+    "WV_rel": {
+      "createVariable": {
+        "name": "WV_rel",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "standard_name":  "wind_velocity",
-      "long_name":       "relative_wind_velocity",
-      "notes":           "measured without compensating for ship speed",
-      "units":          "m s-1",
-      "scale_factor":     0.01,
-      "add_offset":       0.0,
-      "valid_range":      [0,4000]
+      "standard_name": "wind_velocity",
+      "long_name": "relative_wind_velocity",
+      "notes": "measured without compensating for ship speed",
+      "units": "m s-1",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        4000
+      ]
     },
-    "WV_tru":{
-      "createVariable":{
-        "name":         "WV_tru",
-        "dtype":        "f8",
-        "dimensions":   ["t"],
-        "zlib":         true,
-        "lsd":          2
+    "WV_tru": {
+      "createVariable": {
+        "name": "WV_tru",
+        "dtype": "f8",
+        "dimensions": [
+          "t"
+        ],
+        "zlib": true,
+        "lsd": 2
       },
-      "standard_name":  "wind_velocity",
-      "long_name":       "true_wind_velocity",
-      "notes":           "measured, and compensating for ship speed",
-      "units":          "m s-1",
-      "scale_factor":     0.01,
-      "add_offset":       0.0,
-      "valid_range":      [0,4000]
+      "standard_name": "wind_velocity",
+      "long_name": "true_wind_velocity",
+      "notes": "measured, and compensating for ship speed",
+      "units": "m s-1",
+      "scale_factor": 0.01,
+      "add_offset": 0.0,
+      "valid_range": [
+        0,
+        4000
+      ]
     }
   }
 }

@@ -7,6 +7,7 @@ Created on Tue May 15 08:50:59 2018
 """
 import json
 
+
 def merge_default(cnf):
     """
     This function merges the default dictionary with all key dictionaries, replacing default values if needed
@@ -18,14 +19,15 @@ def merge_default(cnf):
         IN :merge_default({'default':{'a':1,'b':2},'var':{'b':3,'c':4}})
         OUT:{'var': {'a': 1, 'b': 3, 'c': 4}}
     """
-    default = cnf.pop('default') # get the default and remove it from the cnf dictionary
+    default = cnf.pop('default')  # get the default and remove it from the cnf dictionary
     for key in cnf.keys():
-        temp=default.copy()
-        temp.update(cnf[key]) #merge and overwrite default
-        cnf[key]=temp #replace with the merged dictionary
+        temp = default.copy()
+        temp.update(cnf[key])  # merge and overwrite default
+        cnf[key] = temp  # replace with the merged dictionary
     return cnf
 
-def get_item(ipath,idata):
+
+def get_item(ipath, idata):
     """
     This function look extract a certain value from the dict idata from the key path ipath.
     input:
@@ -39,11 +41,12 @@ def get_item(ipath,idata):
     """
     paths = ipath.split("/")
     data = idata
-    for i in range(0,len(paths)):
+    for i in range(0, len(paths)):
         data = data[paths[i]]
-    return {paths[-1]:data}
+    return {paths[-1]: data}
 
-def follow_ref(obj,fn,link_key):
+
+def follow_ref(obj, fn, link_key):
     """
     The object_hook function for the json module. It passes the original object unless the key==link_key, then it look up the link to internal key or key of an external json file.
     input:
@@ -55,20 +58,21 @@ def follow_ref(obj,fn,link_key):
         obj - dict - the original obj, but obj[link_key] is replaced by the values found in the link obj[link_key]
     """
     if '$ref' in obj.keys():
-        rfile,ipath=obj[link_key].split('#')
-        if len(rfile)==0: # intenal link (to json file in fn)
-            tcnf=load_json(fn)
-        else: # external link to a json file
-            if rfile[0]=='/':#absolute path
-                tcnf=load_json(rfile,follow_ref)
+        rfile, ipath = obj[link_key].split('#')
+        if len(rfile) == 0:  # intenal link (to json file in fn)
+            tcnf = load_json(fn)
+        else:  # external link to a json file
+            if rfile[0] == '/':  # absolute path
+                tcnf = load_json(rfile, follow_ref)
             else:
-                tcnf=load_json(fn[:fn.rfind('/')+1]+rfile,follow_ref) # relative to the original json file in fn
-        if 'default' in tcnf.keys():# if nessesary merge default values before extracting the desired item
-            tcnf=merge_default(tcnf)
-        obj=get_item(ipath,tcnf)
+                tcnf = load_json(fn[:fn.rfind('/') + 1] + rfile, follow_ref)  # relative to the original json file in fn
+        if 'default' in tcnf.keys():  # if nessesary merge default values before extracting the desired item
+            tcnf = merge_default(tcnf)
+        obj = get_item(ipath, tcnf)
     return obj
 
-def load_json(fn,link_key='$ref'):
+
+def load_json(fn, link_key='$ref'):
     """
     utilize the json module to load the config json file
      - the object_hook funktion is used to enable linking of of internal and external values (see follow_ref). 
@@ -79,12 +83,8 @@ def load_json(fn,link_key='$ref'):
     output:
         cnf - dict - the dictionary parsed from the json file
     """
-    with open(fn,'r') as f:
-        cnf=json.load(f,object_hook=lambda x:follow_ref(x,fn,link_key))
+    with open(fn, 'r') as f:
+        cnf = json.load(f, object_hook=lambda x: follow_ref(x, fn, link_key))
     if 'default' in cnf.keys():
-        cnf=merge_default(cnf)
+        cnf = merge_default(cnf)
     return cnf
-
-
-    
-

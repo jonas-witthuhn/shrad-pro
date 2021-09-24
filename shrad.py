@@ -1,77 +1,71 @@
-import os
 import numpy as np
 
-import modules.utils as utils
 import modules.helpers as helpers
-from modules.helpers import print_status as prints
+import modules.utils as utils
 from modules.helpers import print_debug as printd
+from modules.helpers import print_status as prints
 from modules.helpers import print_warning as printw
-
-
-# config
-
-
 
 # Parsing Command Line Arguments
 parser = helpers.define_commandline_parser()
 args = parser.parse_args()
 
-# set verbose level
-
-VerboseLevel = 0
 if args.debug:
-    args.verbose = True #  enable Verbose if Debug is activ
+    args.verbose = True  # enable Verbose if Debug is active
     printd("Argparse Arguments:")
     printd(str(args))
 
-MESSAGES = {'DEBUG':args.debug,
-            'VERBOSE':args.verbose,
-            'lvl':VerboseLevel}
-  
+MESSAGES = {'debug': args.debug,
+            'verbose': args.verbose,
+            'lvl': 0}
+
 if args.disable_ancillary_ins:
-    printw("You are not using additional INS data, so we rely on the position information of uLogger or GUVis GPS and the alignment angles of the included accelerometer. This is not recommended for the use on the ship, as alignment angles measured by an accelerometer on a ship are errorouse. If the GUVis measures on a fixed positon on Land this might be fine. Continuing...")
+    printw("You are not using additional INS data, so we rely on the position information of uLogger or GUVis GPS"
+           " and the alignment angles of the included accelerometer. This is not recommended for the use on the ship,"
+           " as alignment angles measured by an accelerometer on a ship are erroneous."
+           " If the GUVis measures on a fixed position on Land this might be fine. Continuing...")
 
 ###############################################################################
-### Start File processing
+# Start File processing
 if args.ShradJob == "process":
     prints("Start Processing GUVis files...",
            style='header',
            lvl=MESSAGES['lvl'])
-    MESSAGES.update({'lvl':MESSAGES['lvl']+1})
-    
+    MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
+
     ###########################################################################
-    ### From raw to level 1a
+    # From raw to level 1a
     if args.OutputLevel == 'l1a':
         # identify file prefix of GUVis files
         # the prefix will be added to all dataset files and
         # is required to match for ancillary datasets
         # and
         # identify date and time of file creation of the raw files
-        result = utils.get_pfx_time_from_input(Pattern=args.datetimepattern,
-                                               InputFiles=args.input,
+        result = utils.get_pfx_time_from_input(pattern=args.datetimepattern,
+                                               input_files=args.input,
                                                **MESSAGES)
-        InputPfx,InputDates = result
-        InputDays = InputDates.astype('datetime64[D]')
+        input_pfx, input_dates = result
+        input_days = input_dates.astype('datetime64[D]')
         # process and combine files of unique days
-        for day in np.unique(InputDays):
+        for day in np.unique(input_days):
             if args.verbose:
                 prints(str(f" Processing day: {day} ..."),
-                           lvl=MESSAGES['lvl'])
-                MESSAGES.update({'lvl':MESSAGES['lvl']+1})
-            
+                       lvl=MESSAGES['lvl'])
+                MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
+
             # loading raw data to xarray Dataset
-            ProcessFiles = np.array(args.input)[InputDays==day]
-            DailyDS = utils.load_rawdata_and_combine(Files=ProcessFiles,
-                                                     CalibFile=args.calibration_file,
-                                                     **MESSAGES)
-            if type(DailyDS) == bool:
+            process_files = np.array(args.input)[input_days == day]
+            daily_ds = utils.load_rawdata_and_combine(files=process_files,
+                                                      calib_file=args.calibration_file,
+                                                      **MESSAGES)
+            if type(daily_ds) == bool:
                 # no data? skip day!
                 continue
-                    
+
             # add PFX as global variable to DailyDS
-            DailyDS = DailyDS.assign_attrs({'pfx':InputPfx})
-            
-            # add ancillary data of inertal navigation system
+            daily_ds = daily_ds.assign_attrs({'pfx': input_pfx})
+
+            # add ancillary data of inertial navigation system
             if not args.disable_ancillary_ins:
                 # requires:
                 #  * the correct paths in ConfigFile.ini
@@ -90,56 +84,45 @@ if args.ShradJob == "process":
                 #   * alignment angles (pitch, roll, yaw) define
                 #       the ships alignment and movement 
                 #       (not the GUVis)
-                DailyDS = utils.add_ins_data(DS=DailyDS,
-                                             **MESSAGES)
-                
-                if type(DailyDS) == bool:
-                    continue
-
-            # add meteorologicyl ancillary data
-            if not args.disable_ancillary_met:
-                # requires:
-                #  * the correct paths in ConfigFile.ini
-                #  * ancillary data in the correct netCDF format
-                #  * correct naming of variables in netCDF:
-                #     * time,T,P,RH
-                #  * correct definition of units:
-                #     * T - [K] - air_temperature
-                #     * P - [Pa] - air_pressure
-                #     * RH - [1] - relative_humidity
-
-                DailyDS = utils.add_met_data(DS=DailyDS,
-                                             **MESSAGES)
-                
-                if type(DailyDS) == bool:
+                daily_ds = utils.add_ins_data(ds=daily_ds, **MESSAGES)
+                if type(daily_ds) == bool:
                     continue
 
             # add sun position
-            DailyDS = utils.add_sun_position(DS=DailyDS,
-                                             coords=args.coordinates,
-                                             **MESSAGES)
-            
-            
+            daily_ds = utils.add_sun_position(ds=daily_ds,
+                                              coords=args.coordinates,
+                                              **MESSAGES)
+
             # add proper standard names, attributes, encoding
-            
-            
+
             # store to file
-            
-            
-            
-## alignment correction
 
-
+# alignment correction
 #             if not args.disable_uvcosine_correction:
 #                 # do UV channel corrections
 #                 # for cosine response adjustment depending on
 #                 # diffuser (cosine collector) and inlet
 #                 # ! requires instrument specific calibration file
 #                 # ! -> provided by Biospherical Inc.
-#                 kwords = dict(DS=DailyDS,
-#                               Channels=args.uvcosine_correction_channel,
-#                               File=args.uvcosine_correction_file,
+#                 kwords = dict(ds=daily_ds,
+#                               channels=args.uvcosine_correction_channel,
+#                               correction_file=args.uvcosine_correction_file,
 #                               **MESSAGES)
-#                 DailyDS = utils.correct_uv_cosine_response(**kwords)
-                        
-            
+#                 daily_ds = utils.correct_uv_cosine_response(**kwords)
+
+
+# calculate AOD
+#         # add meteorological ancillary data
+# if not args.disable_ancillary_met:
+#     # requires:
+#     #  * the correct paths in ConfigFile.ini
+#     #  * ancillary data in the correct netCDF format
+#     #  * correct naming of variables in netCDF:
+#     #     * time,T,P,RH
+#     #  * correct definition of units:
+#     #     * T - [K] - air_temperature
+#     #     * P - [Pa] - air_pressure
+#     #     * RH - [1] - relative_humidity
+#     daily_ds = utils.add_met_data(ds=daily_ds, **MESSAGES)
+#     if type(daily_ds) == bool:
+#         continue
