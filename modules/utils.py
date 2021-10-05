@@ -19,7 +19,7 @@ CONFIG.read("ConfigFile.ini")
 
 def get_pfx_time_from_input(pattern,
                             input_files,
-                            VERBOSE=True, DEBUG=False, lvl=0):
+                            verbose=True, debug=False, lvl=0):
     """Parsing Date and Time according to --datetimepattern from raw GUVis files.
     In addition, the file prefix is identified for later use for for all dataset files and to identify ancillary data.
     """
@@ -31,7 +31,7 @@ def get_pfx_time_from_input(pattern,
         _, filename = os.path.split(input_file)
         pfx = filename.split('_')[0]
         m = datetime_parser.match(filename)
-        if DEBUG:
+        if debug:
             printd(f"Parse: {input_file}")
             printd(f"    -- Matches: {m.groupdict()}")
         m = m.groupdict()
@@ -138,9 +138,9 @@ def load_rawdata_and_combine(files,
                                           file=calib_file)
         if not re.match(".*V", radunit):
             if debug:
-                printd(" Files are precalibrated with from the GUVis internal storage, now uncalibrate...")
+                printd(" Files are pre-calibrated with from the GUVis internal storage, now un-calibrate...")
             # data is already calibrated with stored calibration,
-            # thus, remove stored calibration befor calibration
+            # thus, remove stored calibration before calibration
             # with drift corrected calibration factor
             for ch in calib_ds.channel.values:
                 if ch == 0:
@@ -162,7 +162,7 @@ def load_rawdata_and_combine(files,
             prints("... done", lvl=lvl + 1)
     else:
         if debug:
-            printd("No --calibration-file is specified. Assuming precalibrated files.")
+            printd("No --calibration-file is specified. Assuming pre-calibrated files.")
         # no Calibratiofile is given,
         # assuming precalibrated files...
         if re.match(".*V", radunit):
@@ -175,9 +175,72 @@ def load_rawdata_and_combine(files,
     ###################################
     # First combine all radiation channels
 
+    dsa = xr.Dataset()
+    dsa = dsa.assign_coords({'time': ('time', ds.time.data)})
+
+    system_meta = dict(today=dt.datetime.today())
+    for key in CONFIG['Meta'].keys():
+        dsa = dsa.assign_attrs({key: CONFIG['Meta'][key].format(**system_meta)})
+
+    channels = calib_ds.channel.data
+    channel_idx = np.where(channels != 0)  # skipping broadband for now
+    print(channels)
+    print(channel_idx)
+    # add channels as dimension
+    key = 'wavelength'
+    dsa = dsa.assign_coords({'wavelength': ('ch', channels[channel_idx])})
+    dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][key],
+                           'units': CONFIG['CF Units'][key]})
+
+    # add specified centroid wavelength of each spectral channel
+    key = 'centroid_wavelength'
+    dsa = dsa.assign({key: ('ch', calib_ds.centroid_wvl.data[channel_idx])})
+    dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][key],
+                           'units': CONFIG['CF Units'][key]})
+
+    # add measurements of spectral flux of all spectral channels
+    for i, ch in enumerate(dsa.wavelength.values):
+        if i == 0:
+            rad = ds[f'Es{ch}'].data
+        else:
+            rad = np.vstack((rad, ds[f'Es{ch}'].data))
+    rad = rad.T
+
+    key = 'spectral_flux'
+    dsa = dsa.assign({key: (('time', 'ch'), rad)})
+    dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][key],
+                           'units': CONFIG['CF Units'][key]})
+
+    # if available, add the broadband measurements too
+    if 'Es0' in ds.keys():
+        key = 'broadband_flux'
+        dsa = dsa.assign({key: ('time', ds['Es0'].data)})
+        dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][key],
+                               'units': CONFIG['CF Units'][key],
+                               'notes': 'Measured with the GUVis Radiometer'})
+
+    for key in ['EsRoll',
+                'EsPitch',
+                'BioShadeAngle',
+                'BioShadeMode',
+                'EsTemp',
+                'SolarAzimuthAngle',
+                'SolarZenithAngle']:
+        if key in ds.keys():
+            dsa = dsa.assign({key: ('time', ds[key].data)})
+        if key in CONFIG['NC Variables Map'].keys():
+            cfgkey = CONFIG['NC Variables Map'][key]
+        else:
+            cfgkey = key
+        dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][cfgkey],
+                               'units': CONFIG['CF Units'][cfgkey],
+                               'notes': f'Obtained from GUVis raw data'})
+
     if verbose:
         prints("... done", lvl=lvl)
-    return ds
+    return dsa
+
+
 
 
 def get_calibration_factor(date, file):
@@ -395,6 +458,30 @@ def add_sun_position(ds,
                      verbose=True,
                      debug=False,
                      lvl=0):
+    """
+    Adds the sun position calculated based on latitude, longitude and time of the input dataset with trosat.sunpos
+    (https://github.com/hdeneke/trosat-base).
+
+    Parameters
+    ----------
+    ds: xarray.Dataset
+        The input Dataset have to contain 'time' as a Variable, storing numpy.datetime64 data. Optionally, latitude and
+        longitude will be acquired from 'BioGpsLatitude', 'InsLatitude', 'BioGpsLongitude', or 'InsLongitude'.
+    coords: (float, float) or None
+        Fallback (Latitude, Longitude) in degrees North and degrees East, respectively, if ds has no latitude or
+        longitude information. The default is None.
+    verbose: bool
+        Enables verbose output. The default is True.
+    debug: bool
+        Enables debug messages. The default is False.
+    lvl: int
+        Sets the intention level of verbose messages. the default is 0.
+
+    Returns
+    -------
+    ds: xarray.Dataset
+        Same as the input ds, but added the variables 'SolarZenithAngle', 'SolarAzimuthAngle', and 'SunEarthDistance'.
+    """
     # get latitude/longitude from preferred sources
     # Sources: BioGPS > Ships INS > provided stationary coords
     if coords is None:
@@ -463,7 +550,7 @@ def correct_uv_cosine_response(ds,
     """
     # check if file is there:
     if not os.path.exists(file):
-        raise ValueError(f"Cosine Correction of UVchannels is switched on, but can't find the file specified by"
+        raise ValueError(f"Cosine Correction of UV-channels is switched on, but can't find the file specified by"
                          " --uvcosine-correction-file: {File}.")
 
     if ds.time.values[0] < np.datetime64("2016-02-29"):
