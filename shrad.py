@@ -1,10 +1,17 @@
 import numpy as np
+import datetime as dt
+import configparser
 
 import modules.helpers as helpers
 import modules.utils as utils
+import pandas as pd
 from modules.helpers import print_debug as printd
 from modules.helpers import print_status as prints
 from modules.helpers import print_warning as printw
+
+# read config file
+CONFIG = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+CONFIG.read("ConfigFile.ini")
 
 # Parsing Command Line Arguments
 parser = helpers.define_commandline_parser()
@@ -64,6 +71,11 @@ if args.ShradJob == "process":
 
             # add PFX as global variable to DailyDS
             daily_ds = daily_ds.assign_attrs({'pfx': input_pfx})
+            system_meta = dict(today=dt.datetime.today(),
+                               pfx=input_pfx,
+                               origin=process_files)
+            daily_ds = utils.add_nc_global_attrs(ds=daily_ds,
+                                                 system_meta=system_meta)
 
             # add ancillary data of inertial navigation system
             if not args.disable_ancillary_ins:
@@ -93,9 +105,15 @@ if args.ShradJob == "process":
                                               coords=args.coordinates,
                                               **MESSAGES)
 
-            # add proper standard names, attributes, encoding
-
             # store to file
+            output_filename = CONFIG['FNAMES']['l1a'].format(pfx=input_pfx,
+                                                             date=pd.to_datetime(day))
+            utils.store_nc(ds=daily_ds,
+                           output_filename=output_filename,
+                           overwrite=args.overwrite,
+                           **MESSAGES)
+
+
 
 # alignment correction
 #             if not args.disable_uvcosine_correction:

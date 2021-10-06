@@ -59,7 +59,6 @@ def load_rawdata_and_combine(files,
                              verbose=True, debug=False, lvl=0):
     """ Reading raw GUVis files and combine to one dataframe
     """
-
     if verbose:
         prints(f"Load raw data from {len(files)} file(s)...",
                lvl=lvl)
@@ -170,17 +169,9 @@ def load_rawdata_and_combine(files,
             raise ValueError("Files are not calibrated, at least the ASCII Header tells so."
                              " Please specify a --calibration-file.")
 
-    ####################################################################################
     # Make nice dataset with attributes
-    ###################################
-    # First combine all radiation channels
-
     dsa = xr.Dataset()
     dsa = dsa.assign_coords({'time': ('time', ds.time.data)})
-
-    system_meta = dict(today=dt.datetime.today())
-    for key in CONFIG['Meta'].keys():
-        dsa = dsa.assign_attrs({key: CONFIG['Meta'][key].format(**system_meta)})
 
     channels = calib_ds.channel.data
     channel_idx = np.where(channels != 0)  # skipping broadband for now
@@ -241,6 +232,64 @@ def load_rawdata_and_combine(files,
     return dsa
 
 
+def add_nc_global_attrs(ds, system_meta):
+    """
+    Reads and stores global attributes from ConfigFile.ini
+    Parameters
+    ----------
+    ds: xarray.Dataset
+    system_meta: dict
+        Dict storing all variables necessary for string formatting of attributes from the config file
+
+    Returns
+    -------
+    ds: xarray.Dataset
+        The same Dataset as input, but with updated global variables
+    """
+    for key in CONFIG['META'].keys():
+        ds = ds.assign_attrs({key: CONFIG['META'][key].format(**system_meta)})
+    return ds
+
+
+def store_nc(ds, output_filename, overwrite=False,
+             verbose=True, debug=False, lvl=0):
+    """
+    Stores xarray Dataset to given path, and adds zlib encoding to all variables
+
+    Parameters
+    ----------
+    ds: xarray.Dataset
+    overwrite: bool
+        overwrite output files if True, the default is False
+    verbose: bool
+        enable verbose mode, the default is True
+    debug: bool
+        enable debug (more verbose) mode, the default is False
+    lvl: int
+        intend level of verbose messages, the default is 0
+    output_filename: str
+        path of resulting output file
+    """
+    if debug:
+        printd(f"Add 'zlib' encoding to variables: {[key for key in ds.keys()][:]}")
+    encoding = {}
+    for key in ds.keys():
+        encoding.update({key: {'zlib': True}})
+    if verbose:
+        prints(f"Storing to {output_filename} ...", lvl=lvl)
+    print(ds)
+    os.makedirs(os.path.dirname(output_filename),
+                exist_ok=True)
+    if os.path.exists(output_filename):
+        if overwrite:
+            os.remove(output_filename)
+        else:
+            raise ValueError("Output file already exists and --overwrite was not set.")
+    ds.to_netcdf(output_filename,
+                 encoding=encoding)
+    if verbose:
+        prints("... done", lvl=lvl)
+    return 0
 
 
 def get_calibration_factor(date, file):
@@ -531,7 +580,7 @@ def add_sun_position(ds,
                                         " {latkey}, {lonkey}, and time")})
 
     esd = sp.earth_sun_distance(time=ds.time.values[0])
-    ds = ds.assign({'EarthSunDistance': ('', [np.mean(esd)])})
+    ds = ds.assign({'EarthSunDistance': ('scalar', [np.mean(esd)])})
     ds['EarthSunDistance'].attrs.update({'long_name': 'Distance from Earth centre to the sun',
                                          'standard_name': "distance_from_sun",
                                          'units': 'AU'})

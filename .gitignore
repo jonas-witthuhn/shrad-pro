@@ -133,3 +133,7 @@ dmypy.json
 
 # do not track old code
 old
+
+# do not track processed datasets
+example-data/l1*
+example-data/l2*

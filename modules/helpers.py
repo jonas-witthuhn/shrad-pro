@@ -137,6 +137,8 @@ def define_commandline_parser():
                           help="enable processing status messages")
         pars.add_argument('-d', '--debug', action='store_true',
                           help="enable additional debug messages")
+        pars.add_argument('-o', '--overwrite', action='store_true',
+                          help="overwrite existing output files")
         return pars
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
