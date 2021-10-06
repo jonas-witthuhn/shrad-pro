@@ -130,3 +130,6 @@ dmypy.json
 
 # pycharm idea folder
 .idea
+
+# do not track old code
+old
