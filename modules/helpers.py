@@ -165,8 +165,8 @@ def define_commandline_parser():
     # process l1a
     l1a_parser = process_subparser.add_parser("l1a",
                                               formatter_class=argparse.RawTextHelpFormatter,
-                                              description="""Process raw .csv data files to level 1a:
-                                                          calibrated data in daily files of netCDF format.""")
+                                              description=("Process raw .csv data files to level 1a:"
+                                                           " calibrated data in daily files of netCDF format."))
 
     l1a_parser = _add_default(l1a_parser)
     l1a_parser.add_argument('--datetimepattern', type=str,
@@ -190,51 +190,24 @@ def define_commandline_parser():
                             the radiation channels are calibrated with drift
                             corrected calibration factors, by linear interpolation
                             of specified calibration factors and dates in the file.
-                            If this is not wanted and the files are precalibrated
+                            If this is not wanted and the files are pre-calibrated
                             form the GUVis internal storage, than this can be
                             switched of by specifying '--calbration-file ""'.
                             The default is:
                             %(default)s
                             """))
-
-    l1a_parser.add_argument('--uvcosine-correction-channel', action='append', type=int,
-                            default=[305, 313],
-                            help=textwrap.dedent("""\
-                            Add to the list of channels to apply cosine response correction
-                            (for UV channels (e.g., 305,313))
-                            based on Biospherical correction file.
-                            Requires the file specified by --uvchannel-correction-file.
-                            The default channels are %(default)s if available.
-                            """))
-    l1a_parser.add_argument('--uvcosine-correction-file', type=str,
-                            default="data/Correction_function_GUVis3511_SN351.csv",
-                            help=textwrap.dedent("""\
-                            File of correction factors for UV-channel cosine response correction.
-                            File requires comma separated columns and a header line
-                            (solar zenith angle, channel names ...), e.g.:
-                                SZA,Es305,Es313
-                            Provided by Biospherical Inc. (Instrument specific).
-                            The default is %(default)s.
-                            """))
-
     l1a_parser.add_argument("--disable-ancillary-ins",
                             action="store_true",
                             help=textwrap.dedent("""\
                             Disables the use of ancillary 
                             inertal navigation system (INS) data.
                             If not set, the use is enabled and the 
-                            following parameters are aquired from the
+                            following parameters are acquired from the
                             ancillary database (see ConfigFile.ini):
                                 * Position of the GUVis: latitude, longitude
                                 * Alignment of the GUVis: pitch, roll, yaw
                             Subsequently, the solar zenith and azimuth angle
                             will be calculated based on this information.
-                            """))
-
-    l1a_parser.add_argument('--disable-uvcosine-correction',
-                            action='store_true',
-                            help=textwrap.dedent("""\
-                            Optionally switch off UV channel cosine correction.
                             """))
     l1a_parser.add_argument('--coordinates', nargs=2,
                             default=[False, False],
@@ -248,8 +221,46 @@ def define_commandline_parser():
     # process l1b
     l1b_parser = process_subparser.add_parser("l1b",
                                               formatter_class=argparse.RawTextHelpFormatter,
-                                              description="""Process level 1a files to level 1b:
-                                                          adding misalignment and cosine error correction.""")
+                                              description=("Process level 1a files to level 1b:"
+                                                           " adding misalignment and cosine error correction."))
+    l1b_parser = _add_default(l1b_parser)
+    l1b_parser.add_argument('--uvcosine-correction-channel', action='append', type=int,
+                            default=[305, 313],
+                            help=textwrap.dedent("""\
+                            Add to the list of channels to apply cosine response correction
+                            (for UV channels (e.g., 305,313))
+                            based on Biospherical correction file.
+                            Requires the file specified by --uvchannel-correction-file.
+                            The default channels are %(default)s if available.
+                            """))
+    l1b_parser.add_argument('--uvcosine-correction-file', type=str,
+                            default="data/Correction_function_GUVis3511_SN351.csv",
+                            help=textwrap.dedent("""\
+                            File of correction factors for UV-channel cosine response correction.
+                            File requires comma separated columns and a header line
+                            (solar zenith angle, channel names ...), e.g.:
+                                SZA,Es305,Es313
+                            Provided by Biospherical Inc. (Instrument specific).
+                            The default is %(default)s.
+                            """))
+    l1b_parser.add_argument('--disable-uvcosine-correction',
+                            action='store_true',
+                            help=textwrap.dedent("""\
+                            Optionally switch off UV channel cosine correction.
+                            """))
+    l1b_parser.add_argument("--add-ins",
+                            action="store_true",
+                            help=textwrap.dedent("""\
+                            Adds or overwrites ancillary 
+                            inertal navigation system (INS) data.
+                            If set, the following parameters are acquired from the
+                            ancillary database (see ConfigFile.ini):
+                                * Position of the GUVis: latitude, longitude
+                                * Alignment of the GUVis: pitch, roll, yaw
+                            Subsequently, the solar zenith and azimuth angle
+                            will be re-calculated based on this information.
+                            """))
+
     # process l1c
     l1c_parser = process_subparser.add_parser("l1c",
                                               formatter_class=argparse.RawTextHelpFormatter,
@@ -267,7 +278,7 @@ def define_commandline_parser():
     #                             Disables the use of ancillary
     #                             meteorological (INS) data.
     #                             If not set, the use is enabled and the
-    #                             following parameters are aquired from the
+    #                             following parameters are acquired from the
     #                             ancillary database (see ConfigFile.ini):
     #                                 * Basic meteorological parameters:
     #                                     * air temperature

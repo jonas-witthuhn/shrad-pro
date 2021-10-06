@@ -1,4 +1,5 @@
 import numpy as np
+import xarray as xr
 import datetime as dt
 import configparser
 
@@ -26,11 +27,7 @@ MESSAGES = {'debug': args.debug,
             'verbose': args.verbose,
             'lvl': 0}
 
-if args.disable_ancillary_ins:
-    printw("You are not using additional INS data, so we rely on the position information of uLogger or GUVis GPS"
-           " and the alignment angles of the included accelerometer. This is not recommended for the use on the ship,"
-           " as alignment angles measured by an accelerometer on a ship are erroneous."
-           " If the GUVis measures on a fixed position on Land this might be fine. Continuing...")
+
 
 ###############################################################################
 # Start File processing
@@ -43,14 +40,20 @@ if args.ShradJob == "process":
     ###########################################################################
     # From raw to level 1a
     if args.OutputLevel == 'l1a':
+        if args.disable_ancillary_ins:
+            printw(
+                "You are not using additional INS data, so we rely on the position information of uLogger or GUVis GPS"
+                " and the alignment angles of the included accelerometer. This is not recommended for the use on the ship,"
+                " as alignment angles measured by an accelerometer on a ship are erroneous."
+                " If the GUVis measures on a fixed position on Land this might be fine. Continuing...")
         # identify file prefix of GUVis files
         # the prefix will be added to all dataset files and
         # is required to match for ancillary datasets
         # and
         # identify date and time of file creation of the raw files
-        result = utils.get_pfx_time_from_input(pattern=args.datetimepattern,
-                                               input_files=args.input,
-                                               **MESSAGES)
+        result = utils.get_pfx_time_from_raw_input(pattern=args.datetimepattern,
+                                                   input_files=args.input,
+                                                   **MESSAGES)
         input_pfx, input_dates = result
         input_days = input_dates.astype('datetime64[D]')
         # process and combine files of unique days
@@ -106,13 +109,62 @@ if args.ShradJob == "process":
                                               **MESSAGES)
 
             # store to file
-            output_filename = CONFIG['FNAMES']['l1a'].format(pfx=input_pfx,
+            output_filename = CONFIG['FNAMES']['l1a'].format(pfx=daily_ds.pfx,
                                                              date=pd.to_datetime(day))
             utils.store_nc(ds=daily_ds,
                            output_filename=output_filename,
                            overwrite=args.overwrite,
                            **MESSAGES)
 
+            if args.verbose:
+                MESSAGES.update({'lvl': MESSAGES['lvl'] - 1})
+                prints(str(f"... done"),
+                       lvl=MESSAGES['lvl'])
+
+    ###########################################################################
+    # From 1a to level 1b
+    # correct misalignment and apply cosine correction
+    if args.OutputLevel == 'l1b':
+        for input_file in args.input:
+            prints(str(f" Processing file {input_file} ..."),
+                   lvl=MESSAGES['lvl'])
+            MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
+
+            # open input file
+            ds = xr.open_dataset(input_file)
+
+            # initialize corrected dataset
+            flux_vars = [key for key in ds.keys() if key[-4:] == 'flux']
+            ds_corrected = ds.drop_vars(flux_vars)
+
+            # if selected, add ins data
+            if args.add_ins:
+                ds_corrected = utils.add_ins_data(ds=ds_corrected, **MESSAGES)
+                if type(ds_corrected) == bool:
+                    continue
+                # re-calculate sun position
+                ds_corrected = utils.add_sun_position(ds=ds_corrected, **MESSAGES)
+
+            # check data availability
+            # define offset pitch, roll, yaw to ins
+            # calculate apparent zenith and azimuth angles from ship and instrument
+            # correct uv cosine response
+            # correct cosine response error
+            # correct misalignment
+
+            # store to file
+            day = ds.time.values[0].astype('datetime64[D]')
+            output_filename = CONFIG['FNAMES']['l1b'].format(pfx=ds_corrected.pfx,
+                                                             date=pd.to_datetime(day))
+            utils.store_nc(ds=ds_corrected,
+                           output_filename=output_filename,
+                           overwrite=args.overwrite,
+                           **MESSAGES)
+
+            if args.verbose:
+                MESSAGES.update({'lvl': MESSAGES['lvl'] - 1})
+                prints(str(f"... done"),
+                       lvl=MESSAGES['lvl'])
 
 
 # alignment correction

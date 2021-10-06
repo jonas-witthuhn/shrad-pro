@@ -17,9 +17,9 @@ CONFIG = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolat
 CONFIG.read("ConfigFile.ini")
 
 
-def get_pfx_time_from_input(pattern,
-                            input_files,
-                            verbose=True, debug=False, lvl=0):
+def get_pfx_time_from_raw_input(pattern,
+                                input_files,
+                                verbose=True, debug=False, lvl=0):
     """Parsing Date and Time according to --datetimepattern from raw GUVis files.
     In addition, the file prefix is identified for later use for for all dataset files and to identify ancillary data.
     """
@@ -142,14 +142,14 @@ def load_rawdata_and_combine(files,
             # thus, remove stored calibration before calibration
             # with drift corrected calibration factor
             for ch in calib_ds.channel.values:
-                if ch == 0:
+                if int(ch) == 0:
                     # broadband channel calibration is never stored
                     continue
                 cds = calib_ds.sel(channel=ch)
                 cs = cds.calibration_factor_stored
                 ds[f"Es{ch}"] = ds[f"Es{ch}"] * cs
 
-                # apply calibration
+        # apply calibration
         if debug:
             printd("Now Calibrate the radiation data ...")
 
@@ -162,12 +162,13 @@ def load_rawdata_and_combine(files,
     else:
         if debug:
             printd("No --calibration-file is specified. Assuming pre-calibrated files.")
-        # no Calibratiofile is given,
+        # no calibration file is given,
         # assuming precalibrated files...
         if re.match(".*V", radunit):
             # Files are not calibrated
             raise ValueError("Files are not calibrated, at least the ASCII Header tells so."
                              " Please specify a --calibration-file.")
+
 
     # Make nice dataset with attributes
     dsa = xr.Dataset()
@@ -175,8 +176,6 @@ def load_rawdata_and_combine(files,
 
     channels = calib_ds.channel.data
     channel_idx = np.where(channels != 0)  # skipping broadband for now
-    print(channels)
-    print(channel_idx)
     # add channels as dimension
     key = 'wavelength'
     dsa = dsa.assign_coords({'wavelength': ('ch', channels[channel_idx])})
@@ -196,6 +195,8 @@ def load_rawdata_and_combine(files,
         else:
             rad = np.vstack((rad, ds[f'Es{ch}'].data))
     rad = rad.T
+    # convert units: uW cm-2 nm-1 -> W m-2 nm
+    rad *= 1e-2
 
     key = 'spectral_flux'
     dsa = dsa.assign({key: (('time', 'ch'), rad)})
@@ -205,7 +206,9 @@ def load_rawdata_and_combine(files,
     # if available, add the broadband measurements too
     if 'Es0' in ds.keys():
         key = 'broadband_flux'
-        dsa = dsa.assign({key: ('time', ds['Es0'].data)})
+        bb_flux = ds['Es0'].data
+        bb_flux *= 1e-2 # uW cm-2 -> W m-2
+        dsa = dsa.assign({key: ('time', bb_flux)})
         dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][key],
                                'units': CONFIG['CF Units'][key],
                                'notes': 'Measured with the GUVis Radiometer'})
@@ -277,7 +280,6 @@ def store_nc(ds, output_filename, overwrite=False,
         encoding.update({key: {'zlib': True}})
     if verbose:
         prints(f"Storing to {output_filename} ...", lvl=lvl)
-    print(ds)
     os.makedirs(os.path.dirname(output_filename),
                 exist_ok=True)
     if os.path.exists(output_filename):
@@ -531,6 +533,8 @@ def add_sun_position(ds,
     ds: xarray.Dataset
         Same as the input ds, but added the variables 'SolarZenithAngle', 'SolarAzimuthAngle', and 'SunEarthDistance'.
     """
+    if verbose:
+        prints("Calculate and assign sun position data ... ", lvl=lvl)
     # get latitude/longitude from preferred sources
     # Sources: BioGPS > Ships INS > provided stationary coords
     if coords is None:
@@ -545,7 +549,7 @@ def add_sun_position(ds,
             latkey = key
             break
     if type(lat) == bool and not lat:
-        lat = coords[0]
+        lat = np.array([float(coords[0])])
     if type(lat) == bool and not lat:
         raise ValueError("No positional information (latitude) is found! E.g., no information from BioGPS,"
                          " INS data and --coordinates is not set (for stationary observations)")
@@ -557,7 +561,7 @@ def add_sun_position(ds,
             lonkey = key
             break
     if type(lon) == bool and not lon:
-        lon = coords[1]
+        lon = np.array([float(coords[1])])
     if type(lon) == bool and not lon:
         raise ValueError("No positional information (longitude) is found! E.g., no information from BioGPS, "
                          " INS data and --coordinates is not set (for stationary observations)")
@@ -577,13 +581,15 @@ def add_sun_position(ds,
         ds[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][cfgkey],
                               'units': CONFIG['CF Units'][cfgkey],
                               'notes': (f"Calculated using trosat.sunpos with data of the variables:"
-                                        " {latkey}, {lonkey}, and time")})
+                                        f" {latkey}, {lonkey}, and time")})
 
     esd = sp.earth_sun_distance(time=ds.time.values[0])
     ds = ds.assign({'EarthSunDistance': ('scalar', [np.mean(esd)])})
     ds['EarthSunDistance'].attrs.update({'long_name': 'Distance from Earth centre to the sun',
                                          'standard_name': "distance_from_sun",
                                          'units': 'AU'})
+    if verbose:
+        prints("... done", lvl=lvl)
     return ds
 
 
@@ -600,7 +606,7 @@ def correct_uv_cosine_response(ds,
     # check if file is there:
     if not os.path.exists(file):
         raise ValueError(f"Cosine Correction of UV-channels is switched on, but can't find the file specified by"
-                         " --uvcosine-correction-file: {File}.")
+                         f" --uvcosine-correction-file: {file}.")
 
     if ds.time.values[0] < np.datetime64("2016-02-29"):
         printw("For TROPOS GUVis-3511 SN:000350, the UVchannel cosine response correction is required only after"
