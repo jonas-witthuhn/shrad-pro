@@ -1,6 +1,7 @@
 import numpy as np
 import xarray as xr
 import datetime as dt
+import re
 import configparser
 
 import modules.helpers as helpers
@@ -144,8 +145,17 @@ if args.ShradJob == "process":
                     continue
                 # re-calculate sun position
                 ds_corrected = utils.add_sun_position(ds=ds_corrected, **MESSAGES)
+            else:
+                # check if necessary data is available
+                keys = [key for key in ds_corrected.keys()]
+                check = np.any([True for var in keys if re.match(".*Roll", var)])
+                check *= np.any([True for var in keys if re.match(".*Pitch", var)])
+                check *= np.any([True for var in keys if re.match(".*Latitude", var)])
+                check *= np.any([True for var in keys if re.match(".*Longitude", var)])
+                if not check:
+                    raise ValueError("Input data has not enough data for alignment correction."
+                                     " Requires at least Pitch, Roll, Latitude and Longitude")
 
-            # check data availability
             # define offset pitch, roll, yaw to ins
             # calculate apparent zenith and azimuth angles from ship and instrument
             # correct uv cosine response

@@ -596,8 +596,8 @@ def add_sun_position(ds,
 def correct_uv_cosine_response(ds,
                                channels,
                                file,
-                               VERBOSE=True,
-                               DEBUG=False,
+                               verbose=True,
+                               debug=False,
                                lvl=0):
     """ Based on the diffuser material and inlet optic, the UV channels, e.g., Es305 and Es313
     need additional cosine response correction. The correction factor is provided by Biospherical Inc.
@@ -612,12 +612,12 @@ def correct_uv_cosine_response(ds,
         printw("For TROPOS GUVis-3511 SN:000350, the UVchannel cosine response correction is required only after"
                " Diffuser replacement on 2016-02-29. Consider switch of by setting --uvcosine-correction-disable")
 
-    if VERBOSE:
+    if verbose:
         prints("Apply UV channel cosine response correction ...", lvl=lvl)
     corr_ds = pd.read_csv(file, sep=',')
     channels = np.unique(channels)
     for chan in channels:
-        if DEBUG:
+        if debug:
             printd(f"Processing Es{chan} / Es{chan}_corr.")
         # delete data which is corrected by the uLogger software,
         # as this correction is applied to global irradiance only,
@@ -629,6 +629,6 @@ def correct_uv_cosine_response(ds,
                          corr_ds[f'Es{chan}'],
                          ds.SensorZenithAngle.values)
             ds[f'Es{chan}'] = ds[f'Es{chan}'] / c
-    if VERBOSE:
+    if verbose:
         prints("... done", lvl=lvl)
     return ds

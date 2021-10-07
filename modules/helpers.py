@@ -260,6 +260,20 @@ def define_commandline_parser():
                             Subsequently, the solar zenith and azimuth angle
                             will be re-calculated based on this information.
                             """))
+    l1b_parser.add_argument("-a", "--offset-angles", nargs=3,
+                            default=[0, 0, 0],
+                            help=textwrap.dedent("""\
+                            Set the offset-angles (pitch, roll, yaw) for the
+                            difference of ships INS system to instrument set up.
+                            For land station, yaw can be used to define the
+                            orientation of the instrument.
+                            Angles are in degrees, orientation as follows:
+                            * pitch - positive if fore (bow) is up
+                            * roll - positive if starboard is down
+                            * yaw - positive if ship moves clockwise
+                                    or clockwise from north
+                            The default is %{default}s.
+                            """))
 
     # process l1c
     l1c_parser = process_subparser.add_parser("l1c",
