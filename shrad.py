@@ -6,6 +6,7 @@ import configparser
 
 import modules.helpers as helpers
 import modules.utils as utils
+import modules.shcalc as shcalc
 import pandas as pd
 from modules.helpers import print_debug as printd
 from modules.helpers import print_status as prints
@@ -28,7 +29,28 @@ MESSAGES = {'debug': args.debug,
             'verbose': args.verbose,
             'lvl': 0}
 
+###############################################################################
+# Run utility scripts
+if args.ShradJob == "utils":
+    prints("Run utility script on  GUVis files...",
+           style='header',
+           lvl=MESSAGES['lvl'])
+    MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
 
+    if args.utility_script == 'dangle':
+        for input_file in args.input:
+            if args.verbose:
+                prints(str(f" Processing file {input_file} ..."),
+                       lvl=MESSAGES['lvl'])
+                MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
+            ds = xr.open_dataset(input_file)
+            dangles, delta_yaw_guvis = shcalc.estimate_guv2ins_misalignment(ds)
+            if args.verbose:
+                dr = np.round(dangles[0], 3)
+                dp = np.round(dangles[1], 3)
+                dy = np.round(delta_yaw_guvis, 3)
+                prints(f" (delta_roll, delta_pitch) = ({dr}, {dp})", lvl=MESSAGES['lvl'])
+                prints(f" GUVis yaw relative to INS = {dy}", lvl=MESSAGES['lvl'])
 
 ###############################################################################
 # Start File processing
@@ -44,7 +66,8 @@ if args.ShradJob == "process":
         if args.disable_ancillary_ins:
             printw(
                 "You are not using additional INS data, so we rely on the position information of uLogger or GUVis GPS"
-                " and the alignment angles of the included accelerometer. This is not recommended for the use on the ship,"
+                " and the alignment angles of the included accelerometer. "
+                "This is not recommended for the use on the ship,"
                 " as alignment angles measured by an accelerometer on a ship are erroneous."
                 " If the GUVis measures on a fixed position on Land this might be fine. Continuing...")
         # identify file prefix of GUVis files

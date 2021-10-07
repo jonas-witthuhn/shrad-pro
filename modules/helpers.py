@@ -145,8 +145,28 @@ def define_commandline_parser():
     subparsers = parser.add_subparsers(title='ShRad jobs', dest='ShradJob',
                                        help=textwrap.dedent("""\
                                                             Choose:
+                                                                *utils: collection of utility scripts
                                                                 *process: advance input GUVis files in processing level
                                                             """))
+    # utils parser
+    utils_parser = subparsers.add_parser('utils', formatter_class=argparse.RawTextHelpFormatter,
+                                         description=textwrap.dedent("""\
+                                                                     Run utility scripts.
+                                                                     """))
+    utils_subparser = utils_parser.add_subparsers(title='utility scripts', dest='utility_script',
+                                                  help=textwrap.dedent("""\
+                                                                       Choose:
+                                                                           dangle: Calculate offset angles between
+                                                                                   INS platform and GUV instrument
+                                                                       """))
+    dangle_parser = utils_subparser.add_parser("dangle",
+                                               formatter_class=argparse.RawTextHelpFormatter,
+                                               description=("Calculate offset angles of GUV instrument set up on "
+                                                            "the INS platform. These are required for the "
+                                                            "cosine error and misalignment correction using INS data. "
+                                                            "Requires the input of l1a netcdf data."))
+    dangle_parser = _add_default(dangle_parser)
+
     # process parser
     process_parser = subparsers.add_parser('process', formatter_class=argparse.RawTextHelpFormatter,
                                            description=textwrap.dedent("""\

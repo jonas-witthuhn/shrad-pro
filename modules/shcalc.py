@@ -164,5 +164,5 @@ def estimate_guv2ins_misalignment(ds):
     #                 'EsYaw': ('time', ds.InsYaw.data+yaw_guvis)})
     # ds.OffsetRoll.attrs.update({})
 
-    return (delta_roll, delta_pitch), yaw_guvis
+    return (float(delta_roll), float(delta_pitch)), float(yaw_guvis)
 
