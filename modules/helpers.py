@@ -268,11 +268,34 @@ def define_commandline_parser():
                             help=textwrap.dedent("""\
                             Optionally switch off UV channel cosine correction.
                             """))
+    l1b_parser.add_argument('--cosine-error-correction-file', type=str,
+                            default="data/AngularResponse_GUV350_140129.csv",
+                            help=textwrap.dedent("""\
+                            File of correction factors for cosine response error correction.
+                            File requires comma separated values in the form:
+                                0       , [channel 0], ... , [channel N]
+                                [szen 0], f(0,0)     , ... , f(0,N)
+                                ...
+                                [szen M], f(M,0)     , ... , f(M,N)
+                            Provided by Biospherical Inc. (Instrument specific).
+                            The default is %(default)s.
+                            """))
+    l1b_parser.add_argument('--misalignment-correction-file', type=str,
+                            default="data/motioncorrection/C3lookup_{channel}.nc",
+                            help=textwrap.dedent("""\
+                            File (netCDF) with lookup table of correction factors for misalignment correction.
+                            The channel is chosen by the file name format: {channel}
+                            Dataset variables:
+                                k (apparent_szen, szen):  the correction factor
+                                apparent_szen (apparent_szen): the apparent solar zenith angle
+                                szen (szen): the solar zenith angle 
+                            The default is %(default)s.
+                            """))
     l1b_parser.add_argument("--add-ins",
                             action="store_true",
                             help=textwrap.dedent("""\
                             Adds or overwrites ancillary 
-                            inertal navigation system (INS) data.
+                            inertial navigation system (INS) data.
                             If set, the following parameters are acquired from the
                             ancillary database (see ConfigFile.ini):
                                 * Position of the GUVis: latitude, longitude
@@ -281,18 +304,22 @@ def define_commandline_parser():
                             will be re-calculated based on this information.
                             """))
     l1b_parser.add_argument("-a", "--offset-angles", nargs=3,
-                            default=[0, 0, 0],
+                            default=argparse.SUPPRESS,
                             help=textwrap.dedent("""\
-                            Set the offset-angles (pitch, roll, yaw) for the
-                            difference of ships INS system to instrument set up.
-                            For land station, yaw can be used to define the
-                            orientation of the instrument.
-                            Angles are in degrees, orientation as follows:
-                            * pitch - positive if fore (bow) is up
-                            * roll - positive if starboard is down
-                            * yaw - positive if ship moves clockwise
-                                    or clockwise from north
-                            The default is %{default}s.
+                            If specified:
+                                Set the offset-angles (pitch, roll, yaw) for the
+                                difference of ships INS system to instrument set up.
+                                For land station, yaw can be used to define the
+                                orientation of the instrument.
+                                Angles are in degrees, orientation as follows:
+                                    * pitch - positive if fore (bow) is up
+                                    * roll - positive if starboard is down
+                                    * yaw - positive if ship moves clockwise
+                                            or clockwise from north
+                            If not specified:
+                                The offset angles will be retrieved from the data.
+                                See: ./shrad.py utility dangle
+                                (May take a long time)
                             """))
 
     # process l1c

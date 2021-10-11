@@ -1,17 +1,19 @@
 import configparser
-import datetime as dt
 import json
 import os
 import re
-
+import datetime as dt
 import numpy as np
 import pandas as pd
-import trosat.sunpos as sp
 import xarray as xr
+from scipy.interpolate import griddata
+
+import trosat.sunpos as sp
+
+import modules.shcalc as shcalc
 from modules.helpers import print_debug as printd
 from modules.helpers import print_status as prints
 from modules.helpers import print_warning as printw
-from scipy.interpolate import griddata
 
 CONFIG = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 CONFIG.read("ConfigFile.ini")
@@ -52,6 +54,96 @@ def get_pfx_time_from_raw_input(pattern,
         raise ValueError("Input files should always have the same prefix")
     pfx = str(pfx[0])
     return pfx, input_dates
+
+
+def get_calibration_factor(date, file):
+    """
+    Retrieve the corrected calibration factor for GUVis from
+    GUVis_calibrations.json
+
+    Parameters
+    ----------
+    date: numpy.datetime64
+        Day of the data
+    file: str
+        Path to the calibration file (.json)
+
+    Returns
+    -------
+    calib_ds: xarray.Dataset
+        variables:
+            centroid_wvl: nm
+                the centre wavelength of the spectral response
+            calibration_factor: V / (uW cm-2 nm-1)
+                drift corrected calibration factor
+            calibration_factor_stored: V / (uW cm-2 nm-1)
+                calibration factor stored by Biospherical calibration procedure in the instrument storage
+            signal_noise_ratio:
+                Signal/Noise ration retrieved from the Biospherical calibration certificate.
+        coords:
+            channel: nm
+                Name of the spectral channel of the GUVis
+    """
+    date = date.astype('datetime64[D]').astype(int)
+    with open(file, 'r') as f:
+        calibrations = json.load(f)
+
+    channel = calibrations['_CHANNEL']
+    cwvl = calibrations['_CENTROID_WVL']
+    cdates = list(calibrations['calibration'].keys())
+    cdates = np.array(cdates, dtype='datetime64[D]').astype(int)
+    values = []
+    snrs = []
+    stored = []
+    for c in calibrations['calibration'].keys():
+        val = np.array(calibrations['calibration'][c]['calibF'])
+        val[val is None] = np.nan
+        snr = np.array(calibrations['calibration'][c]['SNR'])
+        snr[snr is None] = np.nan
+        stored.append(calibrations['calibration'][c]['stored'])
+        if len(values) == 0:
+            values = np.array(val)
+            snrs = np.array(snr)
+        else:
+            values = np.vstack((values, val))
+            snrs = np.vstack((snrs, snr))
+    stored = np.array(stored, dtype=bool)
+
+    si = np.argsort(cdates)
+    cdates = cdates[si]
+    values = np.array(values[si, :], dtype=np.float)
+    snrs = np.array(snrs[si, :], dtype=np.float)
+    stored = stored[si]
+
+    # fill nan values with interpolatet values
+    for i in range(len(values[0, :])):
+        mask = np.isnan(values[:, i])
+        values[mask, i] = np.interp(np.flatnonzero(mask),
+                                    np.flatnonzero(~mask),
+                                    values[~mask, i])
+        mask = np.isnan(snrs[:, i])
+        snrs[mask, i] = np.interp(np.flatnonzero(mask),
+                                  np.flatnonzero(~mask),
+                                  snrs[~mask, i])
+
+    # interpolation linear between the closest two calibrations
+    # to correct calibration assuming a linear drift
+    ca = griddata(cdates, values, date, method='linear')
+    snr = griddata(cdates, snrs, date, method='linear')
+    if np.all(np.isnan(ca)):
+        ca = griddata(cdates, values, date, method='nearest')
+        snr = griddata(cdates, snrs, date, method='nearest')
+
+    # stored calibration in GUVis uLogger
+    cs = values[stored, :][np.searchsorted(cdates[stored], date) - 1, :]
+
+    calib_ds = xr.Dataset({'centroid_wvl': ('channel', cwvl),
+                           'calibration_factor': ('channel', ca),
+                           'calibration_factor_stored': ('channel', cs),
+                           'signal_noise_ratio': ('channel', snr)},
+                          coords={'channel': ('channel', channel)})
+
+    return calib_ds
 
 
 def load_rawdata_and_combine(files,
@@ -169,7 +261,6 @@ def load_rawdata_and_combine(files,
             raise ValueError("Files are not calibrated, at least the ASCII Header tells so."
                              " Please specify a --calibration-file.")
 
-
     # Make nice dataset with attributes
     dsa = xr.Dataset()
     dsa = dsa.assign_coords({'time': ('time', ds.time.data)})
@@ -222,36 +313,17 @@ def load_rawdata_and_combine(files,
                 'SolarZenithAngle']:
         if key in ds.keys():
             dsa = dsa.assign({key: ('time', ds[key].data)})
-        if key in CONFIG['NC Variables Map'].keys():
-            cfgkey = CONFIG['NC Variables Map'][key]
-        else:
-            cfgkey = key
-        dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][cfgkey],
-                               'units': CONFIG['CF Units'][cfgkey],
-                               'notes': f'Obtained from GUVis raw data'})
+            if key in CONFIG['NC Variables Map'].keys():
+                cfgkey = CONFIG['NC Variables Map'][key]
+            else:
+                cfgkey = key
+            dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][cfgkey],
+                                   'units': CONFIG['CF Units'][cfgkey],
+                                   'notes': f'Obtained from GUVis raw data'})
 
     if verbose:
         prints("... done", lvl=lvl)
     return dsa
-
-
-def add_nc_global_attrs(ds, system_meta):
-    """
-    Reads and stores global attributes from ConfigFile.ini
-    Parameters
-    ----------
-    ds: xarray.Dataset
-    system_meta: dict
-        Dict storing all variables necessary for string formatting of attributes from the config file
-
-    Returns
-    -------
-    ds: xarray.Dataset
-        The same Dataset as input, but with updated global variables
-    """
-    for key in CONFIG['META'].keys():
-        ds = ds.assign_attrs({key: CONFIG['META'][key].format(**system_meta)})
-    return ds
 
 
 def store_nc(ds, output_filename, overwrite=False,
@@ -294,94 +366,23 @@ def store_nc(ds, output_filename, overwrite=False,
     return 0
 
 
-def get_calibration_factor(date, file):
+def add_nc_global_attrs(ds, system_meta):
     """
-    Retrieve the corrected calibration factor for GUVis from 
-    GUVis_calibrations.json
-    
+    Reads and stores global attributes from ConfigFile.ini
     Parameters
     ----------
-    date: numpy.datetime64
-        Day of the data
-    file: str
-        Path to the calibration file (.json)
-    
+    ds: xarray.Dataset
+    system_meta: dict
+        Dict storing all variables necessary for string formatting of attributes from the config file
+
     Returns
     -------
-    calib_ds: xarray.Dataset
-        variables: 
-            centroid_wvl: nm
-                the centre wavelength of the spectral response
-            calibration_factor: V / (uW cm-2 nm-1)
-                drift corrected calibration factor
-            calibration_factor_stored: V / (uW cm-2 nm-1)
-                calibration factor stored by Biospherical calibration procedure in the instrument storage
-            signal_noise_ratio: 
-                Signal/Noise ration retrieved from the Biospherical calibration certificate.
-        coords:
-            channel: nm
-                Name of the spectral channel of the GUVis    
+    ds: xarray.Dataset
+        The same Dataset as input, but with updated global variables
     """
-    date = date.astype('datetime64[D]').astype(int)
-    with open(file, 'r') as f:
-        calibrations = json.load(f)
-
-    channel = calibrations['_CHANNEL']
-    cwvl = calibrations['_CENTROID_WVL']
-    cdates = list(calibrations['calibration'].keys())
-    cdates = np.array(cdates, dtype='datetime64[D]').astype(int)
-    values = []
-    snrs = []
-    stored = []
-    for c in calibrations['calibration'].keys():
-        val = np.array(calibrations['calibration'][c]['calibF'])
-        val[val is None] = np.nan
-        snr = np.array(calibrations['calibration'][c]['SNR'])
-        snr[snr is None] = np.nan
-        stored.append(calibrations['calibration'][c]['stored'])
-        if len(values) == 0:
-            values = np.array(val)
-            snrs = np.array(snr)
-        else:
-            values = np.vstack((values, val))
-            snrs = np.vstack((snrs, snr))
-    stored = np.array(stored, dtype=bool)
-
-    si = np.argsort(cdates)
-    cdates = cdates[si]
-    values = np.array(values[si, :], dtype=np.float)
-    snrs = np.array(snrs[si, :], dtype=np.float)
-    stored = stored[si]
-
-    # fill nan values with interpolatet values
-    for i in range(len(values[0, :])):
-        mask = np.isnan(values[:, i])
-        values[mask, i] = np.interp(np.flatnonzero(mask),
-                                    np.flatnonzero(~mask),
-                                    values[~mask, i])
-        mask = np.isnan(snrs[:, i])
-        snrs[mask, i] = np.interp(np.flatnonzero(mask),
-                                  np.flatnonzero(~mask),
-                                  snrs[~mask, i])
-
-    # interpolation linear between the closest two calibrations
-    # to correct calibration assuming a linear drift
-    ca = griddata(cdates, values, date, method='linear')
-    snr = griddata(cdates, snrs, date, method='linear')
-    if np.all(np.isnan(ca)):
-        ca = griddata(cdates, values, date, method='nearest')
-        snr = griddata(cdates, snrs, date, method='nearest')
-
-    # stored calibration in GUVis uLogger
-    cs = values[stored, :][np.searchsorted(cdates[stored], date) - 1, :]
-
-    calib_ds = xr.Dataset({'centroid_wvl': ('channel', cwvl),
-                           'calibration_factor': ('channel', ca),
-                           'calibration_factor_stored': ('channel', cs),
-                           'signal_noise_ratio': ('channel', snr)},
-                          coords={'channel': ('channel', channel)})
-
-    return calib_ds
+    for key in CONFIG['META'].keys():
+        ds = ds.assign_attrs({key: CONFIG['META'][key].format(**system_meta)})
+    return ds
 
 
 def add_ins_data(ds,
@@ -402,6 +403,8 @@ def add_ins_data(ds,
                "or provide data for this day. Continuing...")
         return False
     ds_ins = xr.open_dataset(fname)
+    # remove nan values
+    ds_ins = ds_ins.dropna('time')
 
     # check variables
     required_vars = ['pitch', 'roll', 'yaw', 'lat', 'lon']
@@ -466,7 +469,8 @@ def add_met_data(ds,
                " or provide data for this day. Continuing...")
         return False
     ds_met = xr.open_dataset(fname)
-
+    # remove nan values
+    ds_met = ds_met.dropna('time')
     # check variables
     required_vars = ['T', 'P', 'RH']
     available_vars = [var for var in ds_met.keys()]
@@ -593,9 +597,67 @@ def add_sun_position(ds,
     return ds
 
 
+def add_offset_angles(ds, drdp, dy):
+    """add offset angles to the dataset
+    """
+    delta_roll, delta_pitch = drdp
+    yaw_guvis = dy
+
+    # apply to dataset
+    ds = ds.assign({'OffsetRoll': ('scalar', [delta_roll]),
+                    'OffsetPitch': ('scalar', [delta_pitch])})
+    ds = ds.assign(EsYaw=lambda ds: ds.InsYaw + yaw_guvis)
+
+    ds.OffsetRoll.attrs.update({'long_name': 'Offset_platform_to_guvis_roll_angle_starboard_down',
+                                'standard_name': 'platform_roll_starboard_down',
+                                'units': 'degrees'})
+    ds.OffsetPitch.attrs.update({'long_name': 'Offset_platform_to_guvis_pitch_angle_fore_up',
+                                 'standard_name': 'platform_pitch_fore_up',
+                                 'units': 'degrees'})
+    ds.EsYaw.attrs.update({'long_name': 'guvis_yaw_clockwise_from_north',
+                           'standard_name': 'platform_yaw_north_east',
+                           'units': 'degrees'})
+    return ds
+
+
+def add_apparent_zenith_angle(ds, verbose=True, debug=False, lvl=0):
+    if verbose:
+        prints("Calculate and assign sun position data ... ", lvl=lvl)
+    # prefer Ins data
+    if "InsRoll" in ds.keys():
+        if debug:
+            printd("Using INS data")
+        rpy = np.vstack((ds.InsRoll.data,
+                         ds.InsPitch.data,
+                         ds.InsYaw.data)).T
+        drdpdy = np.vstack((ds.OffsetRoll.data,
+                            ds.OffsetPitch.data,
+                            np.zeros(ds.OffsetRoll.data.shape))).T
+    else:
+        if debug:
+            printd("Fallback to GUVis accelerometer")
+        rpy = np.vstack((ds.EsRoll.data,
+                         ds.EsPitch.data,
+                         ds.EsYaw.data)).T
+        drdpdy = np.zeros(rpy.shape)
+
+    sun_angles = np.vstack((ds.SolarZenithAngle.data,
+                            ds.SolarAzimuthAngle.data)).T
+
+    apparent_zen = shcalc.calc_apparent_szen(rpy, sun_angles, drdpdy)
+
+    ds = ds.assign({'ApparentSolarZenithAngle': ('time', apparent_zen)})
+    ds.OffsetRoll.attrs.update({'long_name': 'apparent_solar_zenith_angle_from_sensor_normal',
+                                'standard_name': CONFIG['CF Standard Names']['sensor_zenith_angle'],
+                                'units': CONFIG['CF Units']['sensor_zenith_angle']})
+    if verbose:
+        prints("... done", lvl=lvl)
+    return ds
+
+
 def correct_uv_cosine_response(ds,
                                channels,
-                               file,
+                               correction_file,
                                verbose=True,
                                debug=False,
                                lvl=0):
@@ -604,9 +666,9 @@ def correct_uv_cosine_response(ds,
     based on solar zenith angle.
     """
     # check if file is there:
-    if not os.path.exists(file):
+    if not os.path.exists(correction_file):
         raise ValueError(f"Cosine Correction of UV-channels is switched on, but can't find the file specified by"
-                         f" --uvcosine-correction-file: {file}.")
+                         f" --uvcosine-correction-file: {correction_file}.")
 
     if ds.time.values[0] < np.datetime64("2016-02-29"):
         printw("For TROPOS GUVis-3511 SN:000350, the UVchannel cosine response correction is required only after"
@@ -614,21 +676,72 @@ def correct_uv_cosine_response(ds,
 
     if verbose:
         prints("Apply UV channel cosine response correction ...", lvl=lvl)
-    corr_ds = pd.read_csv(file, sep=',')
+    corr_ds = pd.read_csv(correction_file, sep=',')
     channels = np.unique(channels)
     for chan in channels:
-        if debug:
-            printd(f"Processing Es{chan} / Es{chan}_corr.")
-        # delete data which is corrected by the uLogger software,
-        # as this correction is applied to global irradiance only,
-        # e.g., when the BioSHADE is in Z or P position.
-        if f"Es{chan}_corr" in ds.keys():
-            ds = ds.drop_vars(f"Es{chan}_corr")
-        if f"Es{chan}" in ds.keys():
+        if int(chan) in ds.wavelength.data:
+            idx = int(np.where(int(chan) == ds.wavelength.data)[0])
+            if debug:
+                printd(f"Processing Es{chan}.")
             c = griddata(corr_ds['SZA'],
                          corr_ds[f'Es{chan}'],
-                         ds.SensorZenithAngle.values)
-            ds[f'Es{chan}'] = ds[f'Es{chan}'] / c
+                         ds.ApparentSolarZenithAngle.values)
+            C = np.ones(ds.spectral_flux.data.shape)
+            C[:, idx] = 1. / c
+            ds.spectral_flux.values = ds.spectral_flux.values * C
+    if verbose:
+        prints("... done", lvl=lvl)
+    return ds
+
+
+def correct_cosine_and_motion(ds,
+                              cosine_error_file="data/AngularResponse_GUV350_140129.csv",
+                              misalignment_file="data/motioncorrection/C3lookup_{channel}.nc",
+                              verbose=True,
+                              debug=False,
+                              lvl=0):
+    if verbose:
+        prints("Apply cosine error and misalignment correction ...", lvl=lvl)
+    wvls = ds.wavelength.data
+
+    # get cosine response correction factors
+    angdat = np.loadtxt(cosine_error_file, delimiter=',')
+    angwvl = angdat[0, 1:]
+    angzen = angdat[1:, 0]
+    angcors = angdat[1:, 1:]
+    # bb- broadband, sp- spectral
+    angcor_bb = np.mean(angcors[:, :], axis=1)
+    angcor_sp = np.zeros((len(angzen), len(wvls)))
+    for i in range(len(wvls)):
+        angcor_sp[:, i] = angcors[:, np.argmin(np.abs(angwvl - wvls[i]))]
+
+    # apply cosine error corrections
+    cfactor = griddata(angzen, angcor_sp, ds.ApparentSolarZenithAngle.data)
+    ds.spectral_flux.values = ds.spectral_flux.values / cfactor
+    cfactor = griddata(angzen, angcor_bb, ds.ApparentSolarZenithAngle.data)
+    ds.broadband_flux.values = ds.broadband_flux.values / cfactor
+
+    # correct tilt (spectral)
+    ks = []
+    for i, wvl in enumerate(wvls):
+        misalignment_ds = xr.open_dataset(misalignment_file.format(channel=wvl))
+        x, y = np.meshgrid(misalignment_ds.szen.data, misalignment_ds.apparent_szen.data)
+        k = griddata((x.flatten(), y.flatten()),
+                     misalignment_ds.k.data.flatten(),
+                     (ds.SolarZenithAngle.data, ds.ApparentSolarZenithAngle.data))
+        if i == 0:
+            ks = k[:, np.newaxis]
+        else:
+            ks = np.hstack((ks, k[:, np.newaxis]))
+    ds.spectral_flux.values = ds.spectral_flux.values * ks
+
+    # correct tilt (bb)
+    misalignment_ds = xr.open_dataset(misalignment_file.format(channel=0))
+    x, y = np.meshgrid(misalignment_ds.szen.data, misalignment_ds.apparent_szen.data)
+    k = griddata((x.flatten(), y.flatten()),
+                 misalignment_ds.k.data.flatten(),
+                 (ds.SolarZenithAngle.data, ds.ApparentSolarZenithAngle.data))
+    ds.broadband_flux.values = ds.broadband_flux.values * k
     if verbose:
         prints("... done", lvl=lvl)
     return ds

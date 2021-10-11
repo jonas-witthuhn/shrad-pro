@@ -2,6 +2,9 @@ import numpy as np
 from scipy.optimize import minimize_scalar
 from scipy.signal import find_peaks
 from modules import circular as circ
+from modules.helpers import print_debug as printd
+from modules.helpers import print_status as prints
+from modules.helpers import print_warning as printw
 
 
 def rpy2xyz(rpy):
@@ -78,8 +81,8 @@ def xyz2rp(xyz, dyaw=0):
 
     # transform coordinates so that ship is now on x-axis
     # (vector rotates counter clockwise from north)
-    x1 = x*np.cos(dyaw) - y*np.sin(dyaw)
-    y1 = x*np.sin(dyaw) + y*np.cos(dyaw)
+    x1 = x * np.cos(dyaw) - y * np.sin(dyaw)
+    y1 = x * np.sin(dyaw) + y * np.cos(dyaw)
 
     # calculate roll and pitch as seen from the ship
     r = np.arctan2(-y1, z)
@@ -89,9 +92,13 @@ def xyz2rp(xyz, dyaw=0):
     return r, p
 
 
-def estimate_guv2ins_misalignment(ds):
+def estimate_guv2ins_misalignment(ds, verbose=True, debug=False, lvl=0):
     """
-
+    Derive offset alignment angles of GUVis instrument setup on a platform. The INS data
+    corresponds to the platform alignment angles. Offset roll and pitch are defined as
+    seen from the platform (from the platform to the guvis normal vector).
+    The yaw angle of GUVis is the angle positive clockwise from north, as seen from the
+    GUVis accelerometer.
     Parameters
     ----------
     ds: xarray.Dataset
@@ -101,10 +108,23 @@ def estimate_guv2ins_misalignment(ds):
             * InsRoll: INS Roll
             * InsPitch: INS Pitch
             * InsYaw: INS Yaw
+    verbose: bool
+        enable verbose mode, default is True.
+    debug: bool
+        enable debug messages, default is False.
+    lvl: int
+        intend level of verbose messages
+
     Returns
     -------
-
+    ds: xarray.Dataset
+        input dataset with added Offset roll and pitch, and instrument yaw angle
+    (OffsetRoll, OffsetPitch): (float, float)
+        Offset roll and pitch angles from platform to guvis normal vector. [degrees]
+    Yaw_Guvis: float
+        Yaw Angle of the GUVis accelerometer. Positive clockwise from north. [degrees]
     """
+
     def _angle_correlation(a0, a1, b0, b1):
         """ Mean circular correlation of two angle pairs (a0,a1), (b0,b1) in [degrees]
         """
@@ -119,6 +139,8 @@ def estimate_guv2ins_misalignment(ds):
                                          pitch_test, pitch_guvis)
         return 1 - correlation
 
+    if verbose:
+        prints("Calculate Platform to GUVis offset ...", lvl=lvl)
     # roll, pitch, yaw of the ship:
     rpy_ship = np.vstack((ds.InsRoll.data,
                           ds.InsPitch.data,
@@ -131,7 +153,9 @@ def estimate_guv2ins_misalignment(ds):
                           args=(xyz_ship, ds.EsRoll.data, ds.EsPitch.data),
                           method='bounded')
 
-    yaw_guvis = res.x
+    yaw_guvis = float(res.x)
+    if debug:
+        printd(f"Offset Yaw of GUVis: {yaw_guvis:.3f}")
 
     # calculate roll and pitch if ship has a yaw like guvis
     roll_platform, pitch_platform = xyz2rp(xyz_ship, yaw_guvis)
@@ -143,7 +167,7 @@ def estimate_guv2ins_misalignment(ds):
     # as they are erroneous due to the influence of acceleration force
     # 1. step: Find time index between peeks of roll or pitch
     # (width of peaks is assumed minimum 1 second)
-    freq = 1e3/(np.diff(ds.time.data)).astype('timedelta64[ms]').astype(int)
+    freq = 1e3 / (np.diff(ds.time.data)).astype('timedelta64[ms]').astype(int)
     roll_peaks, roll_peaks_res = find_peaks(ds.EsRoll.data, width=[np.mean(freq)])
     pitch_peaks, pitch_peaks_res = find_peaks(ds.EsPitch.data, width=[np.mean(freq)])
 
@@ -154,15 +178,63 @@ def estimate_guv2ins_misalignment(ds):
     idx_half_peak_roll = np.unique(np.concatenate((roll_left_ips,
                                                    roll_right_ips), axis=0))
     idx_half_peak_pitch = np.unique(np.concatenate((pitch_left_ips,
-                                                   pitch_right_ips), axis=0))
-    delta_roll = np.mean(ds.EsRoll[idx_half_peak_roll]-roll_platform[idx_half_peak_roll])
-    delta_pitch = np.mean(ds.EsPitch[idx_half_peak_pitch]-pitch_platform[idx_half_peak_pitch])
+                                                    pitch_right_ips), axis=0))
+    delta_roll = np.mean(ds.EsRoll[idx_half_peak_roll] - roll_platform[idx_half_peak_roll])
+    delta_pitch = np.mean(ds.EsPitch[idx_half_peak_pitch] - pitch_platform[idx_half_peak_pitch])
+    delta_roll = float(delta_roll.data)
+    delta_pitch = float(delta_pitch.data)
 
-    # apply to dataset
-    # ds = ds.assign({'OffsetRoll': ('scalar', delta_roll),
-    #                 'OffsetPitch': ('scalar', delta_pitch),
-    #                 'EsYaw': ('time', ds.InsYaw.data+yaw_guvis)})
-    # ds.OffsetRoll.attrs.update({})
+    if debug:
+        printd(f"OffsetRoll: {delta_roll:.2f}")
+        printd(f"OffsetPitch: {delta_pitch:.2f}")
+    if verbose:
+        prints("... done", lvl=lvl)
+    return (delta_roll, delta_pitch), yaw_guvis
 
-    return (float(delta_roll), float(delta_pitch)), float(yaw_guvis)
 
+def calc_apparent_szen(rpy, sun_angles, drdpdy):
+    """
+    Calculate apparent solar zenith angle, which is the angle between the platform
+    normal and the sun position vector.
+      * pitch -> right-hand rotation around y-axis-> positive if bow is down
+      * roll -> right-hand rotation around x-axis -> positive if starboard is down
+      * yaw -> left-hand rotation around z-axis -> positive if bow moves clockwise
+                or positive from north (if x-axis points towards north)
+
+    Parameters
+    ----------
+    rpy:  tuple(3) or numpy.array(N,3)
+        Roll, pitch, and yaw angle of the platform [degrees]
+    sun_angles: tuple(2) or numpy.array(N,2)
+        solar zenith and azimuth angle [degrees]
+    drdpdy: tuple or numpy.array, shape as rpy
+        Offset roll, pitch, and yaw angle of the radiometer on the platform [degrees]
+
+    Returns
+    -------
+
+    """
+    # platform angles
+    rpy = np.deg2rad(np.array(rpy) + np.array(drdpdy))
+    if len(rpy.shape) == 1:
+        rpy = rpy[np.newaxis, :]
+    r, p, y = rpy.T
+
+    # sun angles
+    sun_angles = np.deg2rad(np.array(sun_angles))
+    if len(sun_angles.shape) == 1:
+        sun_angles = sun_angles[np.newaxis, :]
+    z, a = sun_angles.T
+
+    # apparent azimuth
+    g = a - y
+
+    # apparent zenith
+    coszen = np.sin(z) * np.sin(r) * np.sin(g) \
+        - np.sin(z) * np.sin(p) * np.cos(r) * np.cos(g) \
+        + np.cos(z) * np.cos(p) * np.cos(r)
+
+    apparent_szen = np.rad2deg(np.arccos(coszen))
+    apparent_szen[apparent_szen >= 89] = np.nan
+
+    return apparent_szen  # [degrees] angle between radiometer normal and solar vector

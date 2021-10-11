@@ -38,19 +38,29 @@ if args.ShradJob == "utils":
     MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
 
     if args.utility_script == 'dangle':
+        drolls, dpitchs, dyaws = [], [] ,[]
         for input_file in args.input:
             if args.verbose:
                 prints(str(f" Processing file {input_file} ..."),
                        lvl=MESSAGES['lvl'])
                 MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
             ds = xr.open_dataset(input_file)
-            dangles, delta_yaw_guvis = shcalc.estimate_guv2ins_misalignment(ds)
+            ds, dangles, delta_yaw_guvis = shcalc.estimate_guv2ins_misalignment(ds)
             if args.verbose:
                 dr = np.round(dangles[0], 3)
                 dp = np.round(dangles[1], 3)
                 dy = np.round(delta_yaw_guvis, 3)
+                drolls.append(dr)
+                dpitchs.append(dp)
+                dyaws.append(dy)
                 prints(f" (delta_roll, delta_pitch) = ({dr}, {dp})", lvl=MESSAGES['lvl'])
                 prints(f" GUVis yaw relative to INS = {dy}", lvl=MESSAGES['lvl'])
+        prints(f" Mean: (delta_roll, delta_pitch) = ({np.mean(drolls):.3f}, {np.mean(dpitchs):.3f})",
+               lvl=MESSAGES['lvl'])
+        prints(f" Std: (delta_roll, delta_pitch) = ({np.std(drolls):.3f}, {np.std(dpitchs):.3f})",
+               lvl=MESSAGES['lvl'])
+        prints(f" Mean: GUVis yaw relative to INS = {np.mean(dy):.3f}", lvl=MESSAGES['lvl'])
+        prints(f" Std: GUVis yaw relative to INS = {np.std(dy):.3f}", lvl=MESSAGES['lvl'])
 
 ###############################################################################
 # Start File processing
@@ -94,6 +104,10 @@ if args.ShradJob == "process":
                                                       **MESSAGES)
             if type(daily_ds) == bool:
                 # no data? skip day!
+                if args.verbose:
+                    MESSAGES.update({'lvl': MESSAGES['lvl'] - 1})
+                    prints(str(f"... skipped!"),
+                           lvl=MESSAGES['lvl'])
                 continue
 
             # add PFX as global variable to DailyDS
@@ -125,6 +139,10 @@ if args.ShradJob == "process":
                 #       (not the GUVis)
                 daily_ds = utils.add_ins_data(ds=daily_ds, **MESSAGES)
                 if type(daily_ds) == bool:
+                    if args.verbose:
+                        MESSAGES.update({'lvl': MESSAGES['lvl'] - 1})
+                        prints(str(f"... skipped!"),
+                               lvl=MESSAGES['lvl'])
                     continue
 
             # add sun position
@@ -155,11 +173,7 @@ if args.ShradJob == "process":
             MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
 
             # open input file
-            ds = xr.open_dataset(input_file)
-
-            # initialize corrected dataset
-            flux_vars = [key for key in ds.keys() if key[-4:] == 'flux']
-            ds_corrected = ds.drop_vars(flux_vars)
+            ds_corrected = xr.open_dataset(input_file)
 
             # if selected, add ins data
             if args.add_ins:
@@ -180,13 +194,41 @@ if args.ShradJob == "process":
                                      " Requires at least Pitch, Roll, Latitude and Longitude")
 
             # define offset pitch, roll, yaw to ins
+            if 'offset_angles' in args:
+                dr, dp, dy = args.offset_angles
+                drdp = (float(dr), float(dp))
+                dy = float(dy)
+            else:
+                drdp, dy = shcalc.estimate_guv2ins_misalignment(ds_corrected,
+                                                                **MESSAGES)
+            ds_corrected = utils.add_offset_angles(ds_corrected, drdp, dy)
+
             # calculate apparent zenith and azimuth angles from ship and instrument
+            ds_corrected = utils.add_apparent_zenith_angle(ds_corrected,
+                                                           **MESSAGES)
+
             # correct uv cosine response
+            if not args.disable_uvcosine_correction:
+                # do UV channel corrections
+                # for cosine response adjustment depending on
+                # diffuser (cosine collector) and inlet
+                # ! requires instrument specific calibration file
+                # ! -> provided by Biospherical Inc.
+                kwords = dict(ds=ds_corrected,
+                              channels=args.uvcosine_correction_channel,
+                              correction_file=args.uvcosine_correction_file,
+                              **MESSAGES)
+                ds_corrected = utils.correct_uv_cosine_response(**kwords)
+
             # correct cosine response error
-            # correct misalignment
+            #  and correct misalignment
+            ds_corrected = utils.correct_cosine_and_motion(ds=ds_corrected,
+                                                           cosine_error_file=args.cosine_error_correction_file,
+                                                           misalignment_file=args.misalignment_correction_file,
+                                                           **MESSAGES)
 
             # store to file
-            day = ds.time.values[0].astype('datetime64[D]')
+            day = ds_corrected.time.values[0].astype('datetime64[D]')
             output_filename = CONFIG['FNAMES']['l1b'].format(pfx=ds_corrected.pfx,
                                                              date=pd.to_datetime(day))
             utils.store_nc(ds=ds_corrected,
@@ -200,18 +242,7 @@ if args.ShradJob == "process":
                        lvl=MESSAGES['lvl'])
 
 
-# alignment correction
-#             if not args.disable_uvcosine_correction:
-#                 # do UV channel corrections
-#                 # for cosine response adjustment depending on
-#                 # diffuser (cosine collector) and inlet
-#                 # ! requires instrument specific calibration file
-#                 # ! -> provided by Biospherical Inc.
-#                 kwords = dict(ds=daily_ds,
-#                               channels=args.uvcosine_correction_channel,
-#                               correction_file=args.uvcosine_correction_file,
-#                               **MESSAGES)
-#                 daily_ds = utils.correct_uv_cosine_response(**kwords)
+
 
 
 # calculate AOD
