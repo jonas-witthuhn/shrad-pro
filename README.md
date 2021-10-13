@@ -14,6 +14,8 @@ pip install git+https://github.com/hdeneke/trosat-base.git#egg=trosat-base
 ```
 
 ## References:
+Witthuhn, J., Hünerbein, A., and Deneke, H.: Evaluation of satellite-based aerosol datasets and the CAMS reanalysis over the ocean utilizing shipborne reference observations, Atmos. Meas. Tech., 13, 1387–1412, https://doi.org/10.5194/amt-13-1387-2020, 2020.
+
 Witthuhn, J., Deneke, H., Macke, A., and Bernhard, G.: Algorithms and uncertainties for the determination of multispectral irradiance components and aerosol optical depth from a shipborne rotating shadowband radiometer, Atmos. Meas. Tech., 10, 709–730, https://doi.org/10.5194/amt-10-709-2017, 2017
 
 ## Todo:
