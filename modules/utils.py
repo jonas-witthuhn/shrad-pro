@@ -308,6 +308,8 @@ def load_rawdata_and_combine(files,
                 'EsPitch',
                 'BioShadeAngle',
                 'BioShadeMode',
+                'BioGpsLongitude',
+                'BioGpsLatitude',
                 'EsTemp',
                 'SolarAzimuthAngle',
                 'SolarZenithAngle']:
