@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import xarray as xr
 import datetime as dt
 import re
@@ -7,7 +8,6 @@ import configparser
 import modules.helpers as helpers
 import modules.utils as utils
 import modules.shcalc as shcalc
-import pandas as pd
 from modules.helpers import print_debug as printd
 from modules.helpers import print_status as prints
 from modules.helpers import print_warning as printw
