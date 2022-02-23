@@ -1,0 +1,93 @@
+{
+  "attributes": {
+    "conventions" : "CF-1.10",
+    "licence"     : "CC-BY-SA 3.0",
+    "title"       : "Ancillary data of Inertial Navigation System (INS) for shrad-pro misalignment correction"
+  },
+  "dimensions": {
+    "time" : null
+  },
+  "variables": {
+    "roll": {
+      "shape" : ["time"],
+      "type" : "u2",
+      "attributes" : {
+        "units" : "degrees",
+        "standard_name" : "platform_roll_starboard_down",
+        "long_name" : "roll angle of platform, positive if starboard moves down",
+        "scale_factor": 0.001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    },
+    "pitch": {
+      "shape" : ["time"],
+      "type" : "u2",
+      "attributes" : {
+        "units" : "degrees",
+        "standard_name" : "platform_pitch_fore_up",
+        "long_name" : "pitch angle of platform, positive if fore moves up",
+        "scale_factor": 0.001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    },
+    "yaw": {
+      "shape" : ["time"],
+      "type" : "u2",
+      "attributes" : {
+        "units" : "degrees",
+        "standard_name" : "platform_yaw_fore_starboard",
+        "long_name" : "yaw angle of platform, positive clockwise from north",
+        "scale_factor": 0.001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    },
+    "lat": {
+      "shape" : ["time"],
+      "type" : "u4",
+      "attributes" : {
+        "units" : "degrees_north",
+        "standard_name" : "latitude",
+        "long_name" : "latitude north",
+        "scale_factor": 0.00001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      },
+    },
+    "lon": {
+      "shape": ["time"],
+      "type": "u4",
+      "attributes": {
+        "units": "degrees_east",
+        "standard_name": "longitude",
+        "long_name": "longitude east",
+        "scale_factor": 0.00001
+      },
+      "encoding": {
+        "zlib": true,
+        "complevel": 6
+      }
+    },
+    "time": {
+      "shape" : ["time"],
+      "type" : "u4",
+      "attributes" : {
+        "calendar" : "proleptic_gregorian"
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    }
+  }
+}

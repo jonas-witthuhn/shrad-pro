@@ -1,0 +1,90 @@
+{
+  "attributes": {
+    "conventions" : "CF-1.10",
+    "licence"     : "CC-BY-SA 3.0",
+    "title"       : "Ancillary data of meteorological parameter (MET) for shrad-pro misalignment correction"
+  },
+  "dimensions": {
+    "time" : null
+  },
+  "variables": {
+    "RH": {
+      "shape" : ["time"],
+      "type" : "u2",
+      "attributes" : {
+        "units" : "1",
+        "standard_name" : "relative_humidity",
+        "scale_factor": 0.0001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    },
+    "T": {
+      "shape" : ["time"],
+      "type" : "u2",
+      "attributes" : {
+        "units" : "K",
+        "standard_name" : "air_temperature",
+        "scale_factor": 0.001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    },
+    "P": {
+      "shape" : ["time"],
+      "type" : "u2",
+      "attributes" : {
+        "units" : "Pa",
+        "standard_name" : "air_pressure",
+        "scale_factor": 0.001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    },
+    "lat": {
+      "shape" : ["time"],
+      "type" : "u4",
+      "attributes" : {
+        "units" : "degrees_north",
+        "standard_name" : "latitude",
+        "long_name" : "latitude north",
+        "scale_factor": 0.00001
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      },
+    },
+    "lon": {
+      "shape": ["time"],
+      "type": "u4",
+      "attributes": {
+        "units": "degrees_east",
+        "standard_name": "longitude",
+        "long_name": "longitude east",
+        "scale_factor": 0.00001
+      },
+      "encoding": {
+        "zlib": true,
+        "complevel": 6
+      }
+    },
+    "time": {
+      "shape" : ["time"],
+      "type" : "u4",
+      "attributes" : {
+        "calendar" : "proleptic_gregorian"
+      },
+      "encoding" : {
+        "zlib" : true,
+        "complevel" : 6
+      }
+    }
+  }
+}

@@ -3,6 +3,8 @@ netCDF4
 xarray
 pandas
 scipy
-
-trosat-base @ git+https://github.com/hdeneke/trosat-base.git#egg=trosat-base
+pip
+    attrdict
+    jstyleson
+    trosat-base @ git+https://github.com/hdeneke/trosat-base.git#egg=trosat-base
 
