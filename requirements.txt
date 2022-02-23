@@ -1,10 +1,10 @@
 # requirements for shrad-pro
 ## conda install available
-numpy~=1.17.0
+numpy
 netCDF4
-xarray~=0.19.0
-pandas~=1.2.3
-scipy~=1.5.3
+xarray
+pandas
+scipy
 pip
 ## pip install required
     attrdict
@@ -13,4 +13,4 @@ pip
 
 # Requirements for docs
 sphinx
-livereload~=2.6.3
+livereload
