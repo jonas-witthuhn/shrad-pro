@@ -1,14 +1,10 @@
+"""
+run `python run_livereload.py` to autocompile docs if changes where made to
+the source files.
+"""
 from livereload import Server, shell
 
 if __name__ == '__main__':
-#     server = Server()
-#     server.watch('source/*.rst', shell("make html"), delay=1)
-#     server.watch('source/*.md', shell("make html"), delay=1)
-#     server.watch('source/*.py', shell("make html"), delay=1)
-#     server.watch('source/_static/*', shell("make html"), delay=1)
-#     server.watch('source/_templates/*', shell("make html"), delay=1)
-#     server.serve(root='build/html')
-    
     server2 = Server()
     server2.watch('source/*.rst', shell("make latexpdf > dev/null"), delay=1)
     server2.watch('source/*.md', shell("make latexpdf > dev/null"), delay=1)
