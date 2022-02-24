@@ -9,8 +9,11 @@ pip
 ## pip install required
     attrdict
     jstyleson
-    git+https://github.com/hdeneke/trosat-base.git#egg=trosat-base
+    git+https://github.com/hdeneke/trosat-base.git#egg=trosat-base; python_version < "3.10"
 
 # Requirements for docs
 sphinx
 livereload
+markdown
+myst-parser
+beautifulsoup4
