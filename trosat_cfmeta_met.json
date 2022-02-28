@@ -77,7 +77,7 @@
     },
     "time": {
       "shape" : ["time"],
-      "type" : "u4",
+      "type" : "u8",
       "attributes" : {
         "calendar" : "proleptic_gregorian"
       },

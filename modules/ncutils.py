@@ -54,7 +54,7 @@ def create_cf_dataset(fname, data, cfjson, attrs={}):
 
     # fill the data
     # apply offset and convert time manually to milliseconds from start-time
-    convtime = (timedata-timedata[0]).astype(int)*1e-6
+    convtime = (timedata-timedata[0]).astype(int)
     f["time"][:] = convtime
 
     for var in cfdict["variables"].keys():
