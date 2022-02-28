@@ -9,6 +9,31 @@ To prepare the required ancillary data one can use `modules/ncutils.create_nc_da
 This module requires the output filename, the Data in a dictionary with appropriate variable naming according to the `cfconv.json` configuration file.
 In the shrad-pro root directory one can find `trosat_cfmeta_ins.json` and `trosat_cfmeta_met.json` as a blueprint for the INS and MET data, respectively.
 
+### Required Variables
+```python
+# INS
+variables = [
+    "pitch", # degrees, positive if fore (bow) goes up
+    "roll", # degrees, positive if portside goes up
+    "yaw", # degrees, positive clockwise from North
+    "lat", # degrees North
+    "lon", # degrees East
+    "time" # numpy datetime64
+]
+```
+
+```python
+# MET
+variables = [
+    "T", # Kelvin, air temperature
+    "P", # Pa, air pressure
+    "RH", # 0-1, relative humidity
+    "lat", # degrees North
+    "lon", # degrees East
+    "time" # numpy datetime64
+]
+```
+
 ### Example usage:
    ```python
    import numpy as np
@@ -26,7 +51,7 @@ In the shrad-pro root directory one can find `trosat_cfmeta_ins.json` and `trosa
    cfjson = "<path>/shrad-pro/trosat_cfmeta_ins.json"
    attrs = {"note": "this note is added additionally as global attribute"}
    # store the data to shrad-pro compatible netCDF4 file
-   ncu.create_nc_dataset(fname, data, cfjson, attrs)
+   ncu.create_cf_dataset(fname, data, cfjson, attrs)
    ```
 
 The output files should be named and stored according to the settings in `ConfigFile.ini`
