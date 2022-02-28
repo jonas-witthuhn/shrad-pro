@@ -64,6 +64,11 @@ Raw data is processed using `python shrad.py process l1a`
 * First things first, the raw data (uLogger .csv output data) should be stored in files <= 1 day. There can be multiple files for one day, collecting of daily data and merging will be done in 
    *shrad* 
 (*modules.utils.load_rawdata_and_combine*), but multiple days in one file have not been implemented/tested yet.
+* Check and modify `ConfigFile.ini`.
+  * update Meta data for campaign and contacts
+  * ensure correct paths
+  * modify output filenames to your liking
+  * 
 * Ensure consistent file naming (As from uLogger output, the filenames will be already usable) 
   * All filenames should start with a prefix separated by an '_'. This will be used to identify the files, define filenames of shrad-output and will be stored in netCDF metadata. See also 
     ConfigFile.ini -> Meta -> pfx.
