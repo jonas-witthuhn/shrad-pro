@@ -173,7 +173,8 @@ def load_rawdata_and_combine(files,
         if type(complete_df) == list:
             complete_df = df.copy()
         else:
-            complete_df = complete_df.append(df, ignore_index=True)
+            # complete_df = complete_df.append(df, ignore_index=True)
+            complete_df = pd.concat([complete_df, df], ignore_index=True)
 
     if type(complete_df) == list:
         # no files, or all files are empty
