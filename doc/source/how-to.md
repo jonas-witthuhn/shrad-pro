@@ -1,4 +1,6 @@
 # How to ...
+
+(sec-howto-ancillary)=
 ## ... prepare ancillary data.
 For functionality a set of ancillary data (see {ref}`sec-intro-ancillary`) is needed in order to:
  
@@ -56,3 +58,25 @@ variables = [
 
 The output files should be named and stored according to the settings in `ConfigFile.ini`
 
+(sec-howto-processraw)=
+## ... start processing raw data
+Raw data is processed using `python shrad.py process l1a`
+* First things first, the raw data (uLogger .csv output data) should be stored in files <= 1 day. There can be multiple files for one day, collecting of daily data and merging will be done in 
+   *shrad* 
+(*modules.utils.load_rawdata_and_combine*), but multiple days in one file have not been implemented/tested yet.
+* Ensure consistent file naming (As from uLogger output, the filenames will be already usable) 
+  * All filenames should start with a prefix separated by an '_'. This will be used to identify the files, define filenames of shrad-output and will be stored in netCDF metadata. See also 
+    ConfigFile.ini -> Meta -> pfx.
+  * All filenames should include a date/time string indicating, when the file was created.
+  ```tip
+    shrad default settings require the date/time string in the form of YYMMDD_HHMM.
+    This can be changed using --datetimepattern. See `shrad.py process l1a --help`
+  ```
+* Setup a correct and up to date calibration file. The default calibration file is data/GUVis_calibrations.json. Use this file as a blueprint, or update accordingly. The calibration file location 
+  can be specified with `--calibration-file`.
+* Setup ancillary data. For raw -> l1a, its not mandatory but recommended to provide the inertial-navigation-system (ins) data. See {ref}`sec-howto-ancillary`) for preparation of these datasets.
+```tip
+If no INS data is available and/or measurements where conducted on land (fixed location),
+use --disable-ancillary-ins to run shrad without requesting ins data.
+In addition, specify location coordinates with --coordinates, if BioGPS data is not available.
+```

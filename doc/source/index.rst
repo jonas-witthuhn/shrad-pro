@@ -9,6 +9,7 @@ ShRad-Pro documentation
    intro
    setup
    how-to
+   todo
 
 
 Indices and tables
