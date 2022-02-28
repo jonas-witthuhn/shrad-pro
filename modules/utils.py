@@ -169,7 +169,7 @@ def load_rawdata_and_combine(files,
             prints(f"Read file {i + 1}/{len(files)} with {fsize:.2f}MB.",
                    lvl=lvl + 1)
 
-        df = pd.read_csv(fname, sep=',', encoding=None)
+        df = pd.read_csv(fname, sep=',', encoding="ISO-8859-1")
         if type(complete_df) == list:
             complete_df = df.copy()
         else:
