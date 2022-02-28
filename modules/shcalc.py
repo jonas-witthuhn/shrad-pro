@@ -92,7 +92,7 @@ def xyz2rp(xyz, dyaw=0):
     return r, p
 
 
-def estimate_guv2ins_misalignment(ds, verbose=True, debug=False, lvl=0):
+def estimate_guv2ins_misalignment(ds, dyaw_assume=None , verbose=True, debug=False, lvl=0):
     """
     Derive offset alignment angles of GUVis instrument setup on a platform. The INS data
     corresponds to the platform alignment angles. Offset roll and pitch are defined as
@@ -108,6 +108,9 @@ def estimate_guv2ins_misalignment(ds, verbose=True, debug=False, lvl=0):
             * InsRoll: INS Roll
             * InsPitch: INS Pitch
             * InsYaw: INS Yaw
+    dyaw_assume: float or None
+        Offset of Heading of instrument to ship ins. If None, this will be assumed, but
+        might be uncertain.
     verbose: bool
         enable verbose mode, default is True.
     debug: bool
@@ -148,8 +151,12 @@ def estimate_guv2ins_misalignment(ds, verbose=True, debug=False, lvl=0):
     # ships normal in cartesian coordinates
     xyz_ship = rpy2xyz(rpy_ship)
     # find yaw offset, between ship and guvis
+    if type(dyaw_assume) == type(None):
+        bounds = [0, 360]
+    else:
+        bounds = [dyaw_assume-10, dyaw_assume+10]
     res = minimize_scalar(_test_yaw,
-                          bounds=[0, 360],
+                          bounds=bounds,
                           args=(xyz_ship, ds.EsRoll.data, ds.EsPitch.data),
                           method='bounded')
 

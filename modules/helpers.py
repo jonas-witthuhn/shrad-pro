@@ -166,6 +166,18 @@ def define_commandline_parser():
                                                             "cosine error and misalignment correction using INS data. "
                                                             "Requires the input of l1a netcdf data."))
     dangle_parser = _add_default(dangle_parser)
+    dangle_parser.add_argument("--dyaw", type=float,
+                               default=None,
+                               help=textwrap.dedent("""\
+                                    Give a rough estimate of the offset of the heading
+                                    of guvis to the ship INS. e.g. GUVis internal system
+                                    is aligned to the single screw close to the diffuser.
+                                    Screw pointing to the ship bow: dyaw=0;
+                                    Screw pointing to the back of the ship: dyaw =180.
+                                    If None dyaw is assumend from the data, but this might
+                                    be uncertain.
+                                    The default is None.
+                                    """))
 
     # process parser
     process_parser = subparsers.add_parser('process', formatter_class=argparse.RawTextHelpFormatter,

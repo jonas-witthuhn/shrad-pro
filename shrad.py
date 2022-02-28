@@ -38,23 +38,25 @@ if args.ShradJob == "utils":
     MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
 
     if args.utility_script == 'dangle':
-        drolls, dpitchs, dyaws = [], [] ,[]
+        drolls, dpitchs, dyaws = [], [], []
         for input_file in args.input:
             if args.verbose:
                 prints(str(f" Processing file {input_file} ..."),
                        lvl=MESSAGES['lvl'])
                 MESSAGES.update({'lvl': MESSAGES['lvl'] + 1})
             ds = xr.open_dataset(input_file)
-            ds, dangles, delta_yaw_guvis = shcalc.estimate_guv2ins_misalignment(ds)
+            dangles, delta_yaw_guvis = shcalc.estimate_guv2ins_misalignment(ds,
+                                                                            args.dyaw)
+            dr = np.round(dangles[0], 3)
+            dp = np.round(dangles[1], 3)
+            dy = np.round(delta_yaw_guvis, 3)
+            drolls.append(dr)
+            dpitchs.append(dp)
+            dyaws.append(dy)
             if args.verbose:
-                dr = np.round(dangles[0], 3)
-                dp = np.round(dangles[1], 3)
-                dy = np.round(delta_yaw_guvis, 3)
-                drolls.append(dr)
-                dpitchs.append(dp)
-                dyaws.append(dy)
                 prints(f" (delta_roll, delta_pitch) = ({dr}, {dp})", lvl=MESSAGES['lvl'])
                 prints(f" GUVis yaw relative to INS = {dy}", lvl=MESSAGES['lvl'])
+                MESSAGES.update({'lvl': MESSAGES['lvl'] - 1})
         prints(f" Mean: (delta_roll, delta_pitch) = ({np.mean(drolls):.3f}, {np.mean(dpitchs):.3f})",
                lvl=MESSAGES['lvl'])
         prints(f" Std: (delta_roll, delta_pitch) = ({np.std(drolls):.3f}, {np.std(dpitchs):.3f})",
