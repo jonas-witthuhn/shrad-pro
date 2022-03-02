@@ -146,7 +146,9 @@ def estimate_guv2ins_misalignment(ds, dyaw_assume=None , verbose=True, debug=Fal
         prints("Calculate Platform to GUVis offset ...", lvl=lvl)
 
     # smooth out ripples using 2sec rolling mean
-    ds = ds.rolling(time=15*2, center=True).mean().dropna("time")
+    drop_var = [key for key in ds.keys() if ((key[:2] != 'Es') and (key[:2] != 'In'))]
+    ds = ds.drop_sel(drop_var)
+    ds = ds.rolling(time=15 * 2, center=True).mean().dropna("time")
 
     # roll, pitch, yaw of the ship:
     rpy_ship = np.vstack((ds.InsRoll.data,
