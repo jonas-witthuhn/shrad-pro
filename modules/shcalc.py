@@ -147,7 +147,7 @@ def estimate_guv2ins_misalignment(ds, dyaw_assume=None , verbose=True, debug=Fal
 
     # smooth out ripples using 2sec rolling mean
     drop_var = [key for key in ds.keys() if ((key[:2] != 'Es') and (key[:2] != 'In'))]
-    ds = ds.drop_sel(drop_var)
+    ds = ds.drop_vars(drop_var)
     ds = ds.rolling(time=15 * 2, center=True).mean().dropna("time")
 
     # roll, pitch, yaw of the ship:
