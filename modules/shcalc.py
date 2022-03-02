@@ -134,16 +134,20 @@ def estimate_guv2ins_misalignment(ds, dyaw_assume=None , verbose=True, debug=Fal
         #     print(a0,a1,b0,b1)
         a_test = circ.corrcoef(a0, a1)
         b_test = circ.corrcoef(b0, b1)
-        return np.mean([a_test, b_test])
+        return np.mean([1-a_test, 1-b_test])
 
     def _test_yaw(yaw_test, xyz_platform, roll_guvis, pitch_guvis):
         roll_test, pitch_test = xyz2rp(xyz_platform, yaw_test)
-        correlation = _angle_correlation(roll_test, roll_guvis,
-                                         pitch_test, pitch_guvis)
-        return 1 - correlation
+        ncorrelation = _angle_correlation(roll_test, roll_guvis,
+                                          pitch_test, pitch_guvis)
+        return ncorrelation
 
     if verbose:
         prints("Calculate Platform to GUVis offset ...", lvl=lvl)
+
+    # smooth out ripples using 2sec rolling mean
+    ds = ds.rolling(time=15*2, center=True).mean().dropna("time")
+
     # roll, pitch, yaw of the ship:
     rpy_ship = np.vstack((ds.InsRoll.data,
                           ds.InsPitch.data,
