@@ -144,8 +144,8 @@ def estimate_guv2ins_misalignment(ds, dyaw_assume=None , verbose=True, debug=Fal
         """ Mean circular correlation of two angle pairs (a0,a1), (b0,b1) in [degrees]
         """
         #     print(a0,a1,b0,b1)
-        a_test = circ.corrcoef(a0, a1)
-        b_test = circ.corrcoef(b0, b1)
+        a_test = circ_corrcoef(a0, a1)
+        b_test = circ_corrcoef(b0, b1)
         return np.mean([1-a_test, 1-b_test])
 
     def _test_yaw(yaw_test, xyz_platform, roll_guvis, pitch_guvis):
