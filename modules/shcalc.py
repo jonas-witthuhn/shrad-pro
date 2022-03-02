@@ -6,6 +6,18 @@ from modules.helpers import print_debug as printd
 from modules.helpers import print_status as prints
 from modules.helpers import print_warning as printw
 
+def circ_corrcoef(x, y, deg=True):
+    """
+    Calculate circular correlation coefficient
+    """
+    if deg:
+        x = np.deg2rad(x)
+        y = np.deg2rad(y)
+    sx = np.sin(x-circmean(x))
+    sy = np.sin(y-circmean(y))
+
+    r = np.sum(sx*sy) / np.sqrt(np.sum(sx**2)*np.sum(sy**2))
+    return r
 
 def rpy2xyz(rpy):
     """
