@@ -650,9 +650,9 @@ def add_apparent_zenith_angle(ds, verbose=True, debug=False, lvl=0):
     apparent_zen = shcalc.calc_apparent_szen(rpy, sun_angles, drdpdy)
 
     ds = ds.assign({'ApparentSolarZenithAngle': ('time', apparent_zen)})
-    ds.OffsetRoll.attrs.update({'long_name': 'apparent_solar_zenith_angle_from_sensor_normal',
-                                'standard_name': CONFIG['CF Standard Names']['sensor_zenith_angle'],
-                                'units': CONFIG['CF Units']['sensor_zenith_angle']})
+    ds.ApparentSolarZenithAngle.attrs.update({'long_name': 'apparent_solar_zenith_angle_from_sensor_normal',
+                                              'standard_name': CONFIG['CF Standard Names']['sensor_zenith_angle'],
+                                              'units': CONFIG['CF Units']['sensor_zenith_angle']})
     if verbose:
         prints("... done", lvl=lvl)
     return ds
