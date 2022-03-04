@@ -7,8 +7,8 @@ ShRad-Pro documentation
    :caption: Contents:
 
    intro
-   setup
    how-to
+   setup
    todo
 
 

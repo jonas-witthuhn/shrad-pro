@@ -59,7 +59,7 @@ variables = [
 The output files should be named and stored according to the settings in `ConfigFile.ini`
 
 (sec-howto-processraw)=
-## ... start processing raw data
+## ... start processing raw data.
 Raw data is processed using `python shrad.py process l1a`
 * First things first, the raw data (uLogger .csv output data) should be stored in files <= 1 day. There can be multiple files for one day, collecting of daily data and merging will be done in 
    *shrad* 
@@ -85,3 +85,30 @@ If no INS data is available and/or measurements where conducted on land (fixed l
 use --disable-ancillary-ins to run shrad without requesting ins data.
 In addition, specify location coordinates with --coordinates, if BioGPS data is not available.
 ```
+
+## .. process data level l1a to l1b.
+Data which is already calibrated, sorted into daily netCDF files and enhanced with ancillary data such as sun position and platform movement angles is described as level **l1a**.
+Level **l1a** data is directly processed from **raw** data (.csv output from uLogger software, see {ref}(`sec-howto-processraw`)).
+Data which is, in addition, corrected for platform movement (only applies for *spectral_flux* and *broadband_flux*) is described as level **l1b**. 
+
+Processing **l1a** to **l1b** data requires the calculation of the *apparent solar zenith angle*, which is the angle between the normal vector of GUVis and the sun position vector.
+To calculate the *apparent solar zenith angle*, information about the platform angles and GUVis setup angles relative to the platform is needed. For definition of coordinate systems, angles and 
+rotations, see {ref}(`sec-def-coords`).
+
+Use `python shrad.py process l1b` to process **l1a** data to level **l1b** (for measurements on the ship):
+1. (optional) If this step is skipped, this script will be triggered in the normal processing, but as it takes a while, it is recommended to do this separately.
+  Find out offset roll and pitch angles of GUVis to the ships INS by using `python shrad.py utils dangle [l1a-filenames]`.
+  This script compares the GUVis measured roll and pitch angles to the 
+   ship angles.
+  The GUVis roll and pitch angles are transformed to the **heading-aligned-coordinate-system** by a minimization method estimating GUVis yaw angle relative to the ship.
+  If the relative yaw angle is known, one can give this script a first guess with the `--dyaw` option.
+  Be careful of angle definitions: {ref}(`sec-def-coords`).
+  As a result, the mean offset roll and pitch angles in **heading-aligned-coordinate-system** are printed, save them for the next step.
+
+2. 
+
+3. 
+
+
+
+

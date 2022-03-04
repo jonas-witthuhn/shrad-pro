@@ -323,6 +323,8 @@ def load_rawdata_and_combine(files,
             dsa[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][cfgkey],
                                    'units': CONFIG['CF Units'][cfgkey],
                                    'notes': f'Obtained from GUVis raw data'})
+    for key in ['EsPitch','EsRoll']:
+        ds[key].attrs.update({'coordinatesys':'guvis-aligned'})
 
     if verbose:
         prints("... done", lvl=lvl)
@@ -447,6 +449,10 @@ def add_ins_data(ds,
         ds[key].attrs.update({'standard_name': CONFIG['CF Standard Names'][cfgkey],
                               'units': CONFIG['CF Units'][cfgkey],
                               'notes': f'Derived from ancillary INS data {fname} of instrument: {insinstrument}'})
+    for key in ['InsPitch','InsRoll']:
+        ds[key].attrs.update({'coordinatesys':'heading-aligned'})
+    ds['InsYaw'].attrs.update({'coordinatesys':'north-aligned'})
+
 
     if verbose:
         prints("... done", lvl=lvl)
@@ -609,16 +615,23 @@ def add_offset_angles(ds, drdp, dy):
     # apply to dataset
     ds = ds.assign({'OffsetRoll': ('scalar', [delta_roll]),
                     'OffsetPitch': ('scalar', [delta_pitch])})
-    ds = ds.assign(EsYaw=lambda ds: ds.InsYaw + yaw_guvis)
+
+    if "InsYaw" in ds.keys():
+        ds = ds.assign(EsYaw=lambda ds: ds.InsYaw + yaw_guvis)
+    else:
+        ds = ds.assign({'EsYaw'})
 
     ds.OffsetRoll.attrs.update({'long_name': 'Offset_platform_to_guvis_roll_angle_starboard_down',
                                 'standard_name': 'platform_roll_starboard_down',
+                                'coordinatesys': 'heading-aligned',
                                 'units': 'degrees'})
     ds.OffsetPitch.attrs.update({'long_name': 'Offset_platform_to_guvis_pitch_angle_fore_up',
                                  'standard_name': 'platform_pitch_fore_up',
+                                 'coordinatesys': 'heading-aligned',
                                  'units': 'degrees'})
     ds.EsYaw.attrs.update({'long_name': 'guvis_yaw_clockwise_from_north',
                            'standard_name': 'platform_yaw_north_east',
+                           'coordinatesys': 'north-aligned',
                            'units': 'degrees'})
     return ds
 
