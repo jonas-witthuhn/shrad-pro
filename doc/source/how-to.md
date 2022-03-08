@@ -105,9 +105,26 @@ Use `python shrad.py process l1b` to process **l1a** data to level **l1b** (for 
   Be careful of angle definitions: {ref}(`sec-def-coords`).
   As a result, the mean offset roll and pitch angles in **heading-aligned-coordinate-system** are printed, save them for the next step.
 
-2. 
+2. run `python shrad.py process l1b -v -a [delta-pitch] [delta-roll] 0 [filenames-l1a-files]` to run the processing using default files and lookup tables for correction of (see also [Witthuhn et al. 
+   2017](https://doi.org/10.5194/amt-10-709-2017)):
+  * *motion*: `--misalignment-correction-file` (default: data/motioncorrection/C3lookup_{channel}.nc)
+  * *cosine error*: `--cosine-error-correction-file` (instrument specific, provided by Biospherical Inc., default: data/AngularResponse_GUV350_140129.csv for GUVis-3511@TROPOS)
+  * *uv-diffusor error*: `--uvcosine-correction-channel` for channel selection, `--uvcosine-correction-file` (instrument specific, provided by Biospherical Inc. default: 
+    data/Correction_function_GUVis3511_SN351.csv)
 
-3. 
+```note
+If l1a data was stored without INS data from the ship,
+ it can be added via --add-ins in the processing from l1a to l1b.
+```
+```note
+For data measured on the ship (incuding INS data from the ship),
+ only delta-roll and delta-pitch are required for -a / --offset-angles option.
+
+Oppositely, for landside data, delta-yaw is used to define the heading of the instrument.
+So it has to be measured during setup. Also delta-roll and delta-pitch should be given as 0.
+```
+
+The corrected files are stored as defined in `ConfigFile.ini`. 
 
 
 

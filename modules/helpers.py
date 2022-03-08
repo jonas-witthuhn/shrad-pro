@@ -292,17 +292,17 @@ def define_commandline_parser():
                             Provided by Biospherical Inc. (Instrument specific).
                             The default is %(default)s.
                             """))
-    l1b_parser.add_argument('--misalignment-correction-file', type=str,
-                            default="data/motioncorrection/C3lookup_{channel}.nc",
-                            help=textwrap.dedent("""\
-                            File (netCDF) with lookup table of correction factors for misalignment correction.
-                            The channel is chosen by the file name format: {channel}
-                            Dataset variables:
-                                k (apparent_szen, szen):  the correction factor
-                                apparent_szen (apparent_szen): the apparent solar zenith angle
-                                szen (szen): the solar zenith angle 
-                            The default is %(default)s.
-                            """))
+    # l1b_parser.add_argument('--misalignment-correction-file', type=str,
+    #                         default="data/motioncorrection/C3lookup_{channel}.nc",
+    #                         help=textwrap.dedent("""\
+    #                         File (netCDF) with lookup table of correction factors for misalignment correction.
+    #                         The channel is chosen by the file name format: {channel}
+    #                         Dataset variables:
+    #                             k (apparent_szen, szen):  the correction factor
+    #                             apparent_szen (apparent_szen): the apparent solar zenith angle
+    #                             szen (szen): the solar zenith angle
+    #                         The default is %(default)s.
+    #                         """))
     l1b_parser.add_argument("--add-ins",
                             action="store_true",
                             help=textwrap.dedent("""\
@@ -328,6 +328,11 @@ def define_commandline_parser():
                                     * roll - positive if starboard is down
                                     * yaw - positive if ship moves clockwise
                                             or clockwise from north
+                                WARNING: For processing on ship measurements,
+                                         yaw should be set to 0, as roll and pitch
+                                         are already in heading aligned coordinate
+                                         system. Use yaw on land measurements,
+                                         if INS data is not available!
                             If not specified:
                                 The offset angles will be retrieved from the data.
                                 See: ./shrad.py utility dangle

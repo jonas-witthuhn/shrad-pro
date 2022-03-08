@@ -712,7 +712,7 @@ def correct_uv_cosine_response(ds,
 
 def correct_cosine_and_motion(ds,
                               cosine_error_file="data/AngularResponse_GUV350_140129.csv",
-                              misalignment_file="data/motioncorrection/C3lookup_{channel}.nc",
+                              # misalignment_file="data/motioncorrection/C3lookup_{channel}.nc",
                               verbose=True,
                               debug=False,
                               lvl=0):
@@ -737,26 +737,37 @@ def correct_cosine_and_motion(ds,
     cfactor = griddata(angzen, angcor_bb, ds.ApparentSolarZenithAngle.data)
     ds.broadband_flux.values = ds.broadband_flux.values / cfactor
 
+    # TODO:
+    # Correction Factors C3 (according to https://doi.org/10.5194/amt-10-709-2017)
+    # not implemented yet, as it shows overcomensation vs C1:
+    # - recalculate lookuptables
+    # - aerosoltype forecast implementation?
+
     # correct tilt (spectral)
-    ks = []
-    for i, wvl in enumerate(wvls):
-        misalignment_ds = xr.open_dataset(misalignment_file.format(channel=wvl))
-        x, y = np.meshgrid(misalignment_ds.szen.data, misalignment_ds.apparent_szen.data)
-        k = griddata((x.flatten(), y.flatten()),
-                     misalignment_ds.k.data.flatten(),
-                     (ds.SolarZenithAngle.data, ds.ApparentSolarZenithAngle.data))
-        if i == 0:
-            ks = k[:, np.newaxis]
-        else:
-            ks = np.hstack((ks, k[:, np.newaxis]))
-    ds.spectral_flux.values = ds.spectral_flux.values * ks
+    # ks = []
+    # for i, wvl in enumerate(wvls):
+    #     misalignment_ds = xr.open_dataset(misalignment_file.format(channel=wvl))
+    #     x, y = np.meshgrid(misalignment_ds.szen.data, misalignment_ds.apparent_szen.data)
+    #     k = griddata(np.vstack([x.flatten(), y.flatten()]).T,
+    #                  misalignment_ds.k.data.flatten(),
+    #                  np.vstack([ds.SolarZenithAngle.data, ds.ApparentSolarZenithAngle.data]).T)
+    #     if i == 0:
+    #         ks = k[:, np.newaxis]
+    #     else:
+    #         ks = np.hstack((ks, k[:, np.newaxis]))
+    # ds.spectral_flux.values = ds.spectral_flux.values * ks
 
     # correct tilt (bb)
-    misalignment_ds = xr.open_dataset(misalignment_file.format(channel=0))
-    x, y = np.meshgrid(misalignment_ds.szen.data, misalignment_ds.apparent_szen.data)
-    k = griddata((x.flatten(), y.flatten()),
-                 misalignment_ds.k.data.flatten(),
-                 (ds.SolarZenithAngle.data, ds.ApparentSolarZenithAngle.data))
+    # misalignment_ds = xr.open_dataset(misalignment_file.format(channel=0))
+    # x, y = np.meshgrid(misalignment_ds.szen.data, misalignment_ds.apparent_szen.data)
+    # k = griddata(np.vstack([x.flatten(), y.flatten()]).T,
+    #              misalignment_ds.k.data.flatten(),
+    #              np.vstack([ds.SolarZenithAngle.data, ds.ApparentSolarZenithAngle.data]).T)
+
+    # apply C1 correction (consider only direct irradiance) for now
+    k = np.cos(np.deg2rad(ds.SolarZenithAngle.data))
+    k/= np.cos(np.deg2rad(ds.ApparentSolarZenithAngle.data))
+    ds.spectral_flux.values = ds.spectral_flux.values * k
     ds.broadband_flux.values = ds.broadband_flux.values * k
     if verbose:
         prints("... done", lvl=lvl)

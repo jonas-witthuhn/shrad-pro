@@ -226,7 +226,7 @@ if args.ShradJob == "process":
             #  and correct misalignment
             ds_corrected = utils.correct_cosine_and_motion(ds=ds_corrected,
                                                            cosine_error_file=args.cosine_error_correction_file,
-                                                           misalignment_file=args.misalignment_correction_file,
+                                                           # misalignment_file=args.misalignment_correction_file,
                                                            **MESSAGES)
 
             # store to file
