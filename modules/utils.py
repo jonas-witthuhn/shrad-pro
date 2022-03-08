@@ -767,7 +767,7 @@ def correct_cosine_and_motion(ds,
     # apply C1 correction (consider only direct irradiance) for now
     k = np.cos(np.deg2rad(ds.SolarZenithAngle.data))
     k/= np.cos(np.deg2rad(ds.ApparentSolarZenithAngle.data))
-    ds.spectral_flux.values = ds.spectral_flux.values * k
+    ds.spectral_flux.values = ds.spectral_flux.values * k[:,np.newaxis]
     ds.broadband_flux.values = ds.broadband_flux.values * k
     if verbose:
         prints("... done", lvl=lvl)
